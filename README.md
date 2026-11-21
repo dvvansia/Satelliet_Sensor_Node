@@ -6,6 +6,17 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Schematic%20Complete-brightgreen)
 
+## 🌐 Live Portfolio Website
+
+**View the interactive cyanotype blueprint portfolio:** https://dvvansia.github.io/Satelliet_Sensor_Node
+
+The website features:
+- 4-sheet interactive engineering blueprint with cyanotype aesthetic
+- Live RF link budget calculator with real-time physics recalculation
+- Detailed subsystem callouts with simulation results and schematics
+- Engineering roadmap and contact form
+- Responsive design with GitHub Pages deployment
+
 ---
 
 ## Overview
