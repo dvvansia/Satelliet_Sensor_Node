@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANSIA AVIONICS & SPACE SYSTEMS | Satellite Sensor Node Blueprint</title>
+    <style>
+        :root {
+            --blueprint-blue: #1B4F9C;
+            --fold-shadow: #0E2F66;
+            --line-white: #F2F6FA;
+            --accent-yellow: #FFD23F;
+            --paper-texture: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><filter id="turb"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="200" height="200" filter="url(%23turb)" opacity="0.08"/></svg>');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Arial Narrow", "DIN Alternate", "Roboto Mono", Menlo, Consolas, monospace;
+            background: var(--blueprint-blue);
+            background-image: var(--paper-texture);
+            color: var(--line-white);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .sheet {
+            min-height: 100vh;
+            padding: 40px 60px;
+            position: relative;
+            border-bottom: 2px solid var(--fold-shadow);
+        }
+
+        .sheet::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 48%, var(--fold-shadow) 50%, transparent 52%);
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .border-frame {
+            border: 3px solid var(--line-white);
+            height: 100%;
+            padding: 30px;
+            position: relative;
+        }
+
+        .grid-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .grid-marker {
+            position: absolute;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--line-white);
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-style: italic;
+            font-family: Georgia, serif;
+        }
+
+        .title-block {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            border: 2px solid var(--line-white);
+            padding: 15px;
+            min-width: 250px;
+            background: rgba(14, 47, 102, 0.5);
+        }
+
+        .title-block table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .title-block td {
+            padding: 4px 8px;
+            border: 1px solid var(--line-white);
+        }
+
+        .title-block td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .satellite-emblem {
+            animation: hover 3s ease-in-out infinite;
+        }
+
+        @keyframes hover {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .main-drawing {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .main-drawing svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .dimension-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 2px solid var(--line-white);
+            border-collapse: collapse;
+        }
+
+        .dimension-table th,
+        .dimension-table td {
+            border: 1px solid var(--line-white);
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .dimension-table th {
+            background: rgba(14, 47, 102, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .dimension-table tr:hover {
+            background: rgba(255, 210, 63, 0.1);
+        }
+
+        .slider-container {
+            margin: 30px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .slider-value {
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--fold-shadow);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-yellow);
+            cursor: pointer;
+            border: 2px solid var(--line-white);
+        }
+
+        .detail-callout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .detail-circle {
+            border: 3px solid var(--line-white);
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .detail-circle:hover {
+            border-color: var(--accent-yellow);
+            background: rgba(255, 210, 63, 0.1);
+        }
+
+        .detail-circle h3 {
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+        }
+
+        .timeline {
+            margin: 40px 0;
+        }
+
+        .timeline-bar {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .timeline-marker {
+            width: 15px;
+            height: 15px;
+            background: var(--accent-yellow);
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            border-left: 2px solid var(--line-white);
+            padding-left: 20px;
+            padding-bottom: 20px;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: transparent;
+            border: 2px solid var(--line-white);
+            color: var(--line-white);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .contact-form button {
+            background: var(--accent-yellow);
+            color: var(--fold-shadow);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form button:hover {
+            background: var(--line-white);
+        }
+
+        .stamp {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 5px solid var(--accent-yellow);
+            padding: 30px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .stamp.visible {
+            opacity: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 47, 102, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--blueprint-blue);
+            border: 3px solid var(--accent-yellow);
+            padding: 40px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--line-white);
+            cursor: pointer;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sheet {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .title-block {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SHEET 1: System Block & General Arrangement -->
+    <section class="sheet" id="sheet1">
+        <div class="border-frame">
+            <div class="grid-markers">
+                <!-- Grid markers will be added by JS -->
+            </div>
+
+            <div class="logo-container">
+                <svg class="satellite-emblem" viewBox="0 0 100 100">
+                    <path d="M50 20 L60 40 L80 40 L65 55 L70 75 L50 65 L30 75 L35 55 L20 40 L40 40 Z" 
+                          fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="8" fill="var(--line-white)"/>
+                    <line x1="20" y1="30" x2="80" y2="30" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
+                </svg>
+            </div>
+
+            <div class="header">
+                <h1>SATELLITE SYSTEMS DRAWN TO MEASURE</h1>
+                <p>One engineer. Four subsystems. End-to-end telemetry from 12V bus to ground station.</p>
+            </div>
+
+            <div class="main-drawing">
+                <svg viewBox="0 0 1000 600" id="main-svg">
+                    <!-- Center lines -->
+                    <line x1="50" y1="300" x2="950" y2="300" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="10,5,2,5"/>
+                    <line x1="500" y1="50" x2="500" y2="550" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="10,5,2,5"/>
+
+                    <!-- Power Stage -->
+                    <rect x="100" y="200" width="150" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    <text x="175" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">POWER</text>
+                    <text x="175" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">12V→3.3V</text>
+                    <text x="175" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">&gt;92% EFF</text>
+
+                    <!-- Avionics Core -->
+                    <rect x="350" y="200" width="180" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    <text x="440" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">ATMEGA328P</text>
+                    <text x="440" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">16 MHz</text>
+                    <text x="440" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">AVCC/AREF</text>
+
+                    <!-- Sensor Payload -->
+                    <rect x="600" y="200" width="150" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    <text x="675" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">SENSORS</text>
+                    <text x="675" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">LM35, I2C</text>
+                    <text x="675" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">10-bit ADC</text>
+
+                    <!-- RF Chain -->
+                    <rect x="800" y="200" width="120" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    <text x="860" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">RF LINK</text>
+                    <text x="860" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">UHF/S-Band</text>
+                    <text x="860" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">437 MHz</text>
+
+                    <!-- Connection lines -->
+                    <line x1="250" y1="260" x2="350" y2="260" stroke="var(--line-white)" stroke-width="2"/>
+                    <line x1="530" y1="260" x2="600" y2="260" stroke="var(--line-white)" stroke-width="2"/>
+                    <line x1="750" y1="260" x2="800" y2="260" stroke="var(--line-white)" stroke-width="2"/>
+
+                    <!-- Antenna radiation pattern -->
+                    <path d="M860 180 Q900 140 940 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
+                    <path d="M860 180 Q900 120 980 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
+                    <path d="M860 180 Q900 100 1020 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
+
+                    <!-- Ground station link -->
+                    <line x1="900" y1="160" x2="950" y2="100" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="8,4"/>
+                    <circle cx="950" cy="100" r="5" fill="var(--line-white)"/>
+
+                    <!-- Dimension callouts -->
+                    <text x="175" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">A: 12.0V</text>
+                    <text x="440" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">B: 3.30V</text>
+                    <text x="675" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">D: 10-bit</text>
+                    <text x="860" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">F: 437 MHz</text>
+                </svg>
+            </div>
+
+            <table class="dimension-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                        <th>Verification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A</td>
+                        <td>Bus Input Voltage</td>
+                        <td>12.0 V</td>
+                        <td>LTSpice Simulation</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>Regulated Rail</td>
+                        <td>3.30 V</td>
+                        <td>LTSpice, KiCad ERC</td>
+                    </tr>
+                    <tr>
+                        <td>C</td>
+                        <td>Buck Efficiency</td>
+                        <td>&gt;92%</td>
+                        <td>LTSpice Power Analysis</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>ADC Resolution</td>
+                        <td>10-bit (4.88 mV/step)</td>
+                        <td>Proteus Virtual Terminal</td>
+                    </tr>
+                    <tr>
+                        <td>E</td>
+                        <td>UART Baud Rate</td>
+                        <td>9600 bps</td>
+                        <td>Proteus Simulation</td>
+                    </tr>
+                    <tr>
+                        <td>F</td>
+                        <td>Carrier Frequency</td>
+                        <td>437 MHz (UHF)</td>
+                        <td>MATLAB Link Budget</td>
+                    </tr>
+                    <tr>
+                        <td>G</td>
+                        <td>Slant Range</td>
+                        <td>1450 km (LEO)</td>
+                        <td>MATLAB Orbital Model</td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>EIRP</td>
+                        <td>1.35 dBW</td>
+                        <td>MATLAB Link Calculator</td>
+                    </tr>
+                    <tr>
+                        <td>I</td>
+                        <td>Received Eb/N0</td>
+                        <td>23.65 dB</td>
+                        <td>MATLAB BER Analysis</td>
+                    </tr>
+                    <tr>
+                        <td>J</td>
+                        <td>Link Margin</td>
+                        <td>+14.07 dB</td>
+                        <td>MATLAB Link Closure</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="title-block">
+                <table>
+                    <tr>
+                        <td>TITLE</td>
+                        <td>SATELLITE SENSOR NODE — INTEGRATED AVIONICS</td>
+                    </tr>
+                    <tr>
+                        <td>DRAWN BY</td>
+                        <td>DHRUVRAJSINH VANSIA</td>
+                    </tr>
+                    <tr>
+                        <td>SCALE</td>
+                        <td>1:1 / NTS</td>
+                    </tr>
+                    <tr>
+                        <td>SHEET</td>
+                        <td id="sheet-num">1 OF 4</td>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td id="current-date">2026-11-21</td>
+                    </tr>
+                    <tr>
+                        <td>DRG NO.</td>
+                        <td id="drwg-no">VSN-2026-REV-A</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHEET 2: Live Link Budget Configurator -->
+    <section class="sheet" id="sheet2">
+        <div class="border-frame">
+            <div class="header">
+                <h1>MEASURE & CONFIGURE</h1>
+                <p>Live satellite link budget calculator with real-time physics recalculation</p>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Carrier Frequency</span>
+                    <span class="slider-value" id="freq-value">437 MHz</span>
+                </div>
+                <input type="range" id="freq-slider" min="145" max="12000" value="437" step="1">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
+                    <span>VHF (145 MHz)</span>
+                    <span>UHF (437 MHz)</span>
+                    <span>S-Band (2400 MHz)</span>
+                    <span>Ku-Band (12000 MHz)</span>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Slant Range / Altitude</span>
+                    <span class="slider-value" id="range-value">1450 km</span>
+                </div>
+                <input type="range" id="range-slider" min="400" max="38500" value="1450" step="50">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
+                    <span>LEO (400 km)</span>
+                    <span>MEO (2000 km)</span>
+                    <span>GEO (35786 km)</span>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Data Rate</span>
+                    <span class="slider-value" id="rate-value">9.6 kbps</span>
+                </div>
+                <input type="range" id="rate-slider" min="1200" max="10000000" value="9600" step="1200">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
+                    <span>1.2 kbps</span>
+                    <span>9.6 kbps</span>
+                    <span>100 kbps</span>
+                    <span>10 Mbps</span>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Mission Profile</span>
+                    <span class="slider-value" id="profile-value">CUBESAT UHF</span>
+                </div>
+                <input type="range" id="profile-slider" min="0" max="2" value="0" step="1">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
+                    <span>CUBESAT UHF</span>
+                    <span>LEO S-BAND</span>
+                    <span>GEO KU-BAND</span>
+                </div>
+            </div>
+
+            <div class="main-drawing">
+                <svg viewBox="0 0 1000 400" id="link-budget-svg">
+                    <!-- BER Curve -->
+                    <path id="ber-curve" d="M100 350 Q300 350 500 200 T900 50" fill="none" stroke="var(--line-white)" stroke-width="2"/>
+                    
+                    <!-- Operating point marker -->
+                    <circle id="operating-point" cx="700" cy="100" r="8" fill="var(--accent-yellow)"/>
+                    
+                    <!-- Axes -->
+                    <line x1="100" y1="350" x2="900" y2="350" stroke="var(--line-white)" stroke-width="2"/>
+                    <line x1="100" y1="50" x2="100" y2="350" stroke="var(--line-white)" stroke-width="2"/>
+                    
+                    <text x="500" y="390" text-anchor="middle" font-size="12" fill="var(--line-white)">Eb/N0 (dB)</text>
+                    <text x="40" y="200" text-anchor="middle" font-size="12" fill="var(--line-white)" transform="rotate(-90, 40, 200)">BER</text>
+                    
+                    <!-- Link closure indicator -->
+                    <rect x="750" y="300" width="20" height="20" fill="var(--accent-yellow)" id="link-closure-box"/>
+                    <text x="780" y="315" font-size="10" fill="var(--line-white)">LINK CLOSURE ≥ 3.0 dB</text>
+                </svg>
+            </div>
+
+            <table class="dimension-table" id="live-metrics">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Formula</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EIRP</td>
+                        <td>P_tx - L_tx + G_tx</td>
+                        <td id="eirp-value">1.35 dBW</td>
+                    </tr>
+                    <tr>
+                        <td>FSPL</td>
+                        <td>20log₁₀(4πd/λ)</td>
+                        <td id="fspl-value">155.2 dB</td>
+                    </tr>
+                    <tr>
+                        <td>C/N₀</td>
+                        <td>EIRP - FSPL - L_misc + G/T + 228.6</td>
+                        <td id="cn0-value">48.5 dB-Hz</td>
+                    </tr>
+                    <tr>
+                        <td>Eb/N₀</td>
+                        <td>C/N₀ - 10log₁₀(R_b)</td>
+                        <td id="ebn0-value">23.65 dB</td>
+                    </tr>
+                    <tr>
+                        <td>BER</td>
+                        <td>0.5·erfc(√(10^(Eb/N₀/10)))</td>
+                        <td id="ber-value">1.2×10⁻⁷</td>
+                    </tr>
+                    <tr>
+                        <td>Link Margin</td>
+                        <td>Eb/N₀ - Eb/N₀_req</td>
+                        <td id="margin-value">+14.07 dB</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="title-block">
+                <table>
+                    <tr>
+                        <td>TITLE</td>
+                        <td>LIVE LINK BUDGET CALCULATOR</td>
+                    </tr>
+                    <tr>
+                        <td>DRAWN BY</td>
+                        <td>DHRUVRAJSINH VANSIA</td>
+                    </tr>
+                    <tr>
+                        <td>SCALE</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>SHEET</td>
+                        <td>2 OF 4</td>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td id="current-date-2">2026-11-21</td>
+                    </tr>
+                    <tr>
+                        <td>DRG NO.</td>
+                        <td id="drwg-no-2">VSN-2026-REV-A</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHEET 3: Detail Callouts -->
+    <section class="sheet" id="sheet3">
+        <div class="border-frame">
+            <div class="header">
+                <h1>JOINERY & SUBSYSTEM DETAILS</h1>
+                <p>Four circular detail callouts with engineering artifacts</p>
+            </div>
+
+            <div class="detail-callout">
+                <div class="detail-circle" onclick="openModal('modal1')">
+                    <div>
+                        <h3>DETAIL 01</h3>
+                        <p>Buck Converter</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">LTSpice &gt;92% Efficiency</p>
+                    </div>
+                </div>
+
+                <div class="detail-circle" onclick="openModal('modal2')">
+                    <div>
+                        <h3>DETAIL 02</h3>
+                        <p>ADC & UART</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">Proteus 10-bit Telemetry</p>
+                    </div>
+                </div>
+
+                <div class="detail-circle" onclick="openModal('modal3')">
+                    <div>
+                        <h3>DETAIL 03</h3>
+                        <p>RF Link Budget</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">MATLAB BER Analysis</p>
+                    </div>
+                </div>
+
+                <div class="detail-circle" onclick="openModal('modal4')">
+                    <div>
+                        <h3>DETAIL 04</h3>
+                        <p>Avionics Schematic</p>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">KiCad 2-Layer PCB</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="title-block">
+                <table>
+                    <tr>
+                        <td>TITLE</td>
+                        <td>SUBSYSTEM DETAIL CALLouts</td>
+                    </tr>
+                    <tr>
+                        <td>DRAWN BY</td>
+                        <td>DHRUVRAJSINH VANSIA</td>
+                    </tr>
+                    <tr>
+                        <td>SCALE</td>
+                        <td>VARIES</td>
+                    </tr>
+                    <tr>
+                        <td>SHEET</td>
+                        <td>3 OF 4</td>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td id="current-date-3">2026-11-21</td>
+                    </tr>
+                    <tr>
+                        <td>DRG NO.</td>
+                        <td>VSN-2026-REV-A</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHEET 4: Roadmap & Contact -->
+    <section class="sheet" id="sheet4">
+        <div class="border-frame">
+            <div class="header">
+                <h1>THE ORDER OF WORK</h1>
+                <p>Engineering roadmap, track record & contact</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-bar">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>POWER SIMULATION</h3>
+                        <p>LTSpice buck converter design, 12V→3.3V, &gt;92% efficiency verified</p>
+                    </div>
+                </div>
+
+                <div class="timeline-bar">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>EMBEDDED FIRMWARE</h3>
+                        <p>ATmega329P ADC sensor interface, UART telemetry framing, Proteus validation</p>
+                    </div>
+                </div>
+
+                <div class="timeline-bar">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>RF LINK MODELING</h3>
+                        <p>MATLAB link budget calculator, BPSK/QPSK BER analysis, multi-orbit comparison</p>
+                    </div>
+                </div>
+
+                <div class="timeline-bar">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>AVIONICS SCHEMATIC</h3>
+                        <p>KiCad 2-layer PCB, reverse-polarity protection, ERC-clean design</p>
+                    </div>
+                </div>
+
+                <div class="timeline-bar">
+                    <div class="timeline-marker" style="background: var(--line-white);"></div>
+                    <div class="timeline-content">
+                        <h3>PCB LAYOUT & FAB</h3>
+                        <p>Gerber generation, design rule check, fabrication ready</p>
+                    </div>
+                </div>
+
+                <div class="timeline-bar">
+                    <div class="timeline-marker" style="background: var(--line-white);"></div>
+                    <div class="timeline-content">
+                        <h3>INTEGRATION & FLIGHT TEST</h3>
+                        <p>Subsystem integration, environmental testing, flight qualification</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <h2 style="text-align: center; margin-bottom: 30px; letter-spacing: 0.08em;">TRANSMIT INQUIRY</h2>
+                <input type="text" id="contact-name" placeholder="NAME / ORGANIZATION">
+                <input type="email" id="contact-email" placeholder="EMAIL">
+                <input type="text" id="contact-mission" placeholder="MISSION / ROLE INQUIRY">
+                <textarea id="contact-message" rows="5" placeholder="MESSAGE"></textarea>
+                <button onclick="submitForm()">TRANSMIT INQUIRY</button>
+            </div>
+
+            <div class="stamp" id="received-stamp">
+                RECEIVED — D.V.<br>
+                <span id="stamp-date" style="font-size: 1rem;"></span>
+            </div>
+
+            <div class="title-block">
+                <table>
+                    <tr>
+                        <td>TITLE</td>
+                        <td>ENGINEERING ROADMAP & CONTACT</td>
+                    </tr>
+                    <tr>
+                        <td>DRAWN BY</td>
+                        <td>DHRUVRAJSINH VANSIA</td>
+                    </tr>
+                    <tr>
+                        <td>SCALE</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>SHEET</td>
+                        <td>4 OF 4</td>
+                    </tr>
+                    <tr>
+                        <td>DATE</td>
+                        <td id="current-date-4">2026-11-21</td>
+                    </tr>
+                    <tr>
+                        <td>DRG NO.</td>
+                        <td>VSN-2026-REV-A</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal" id="modal1" onclick="closeModal(event, 'modal1')">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal(event, 'modal1')">&times;</span>
+            <h2>DETAIL 01 — BUCK CONVERTER</h2>
+            <p style="margin: 20px 0;">LTSpice simulation of 12V to 3.3V buck converter with &gt;92% efficiency</p>
+            <img src="assets/buck_output.png" alt="Buck Converter Output Waveform" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
+            <img src="assets/buck_circuit.png" alt="Buck Converter Circuit" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
+            <table class="dimension-table">
+                <tr><td>Input Voltage</td><td>12.0 V</td></tr>
+                <tr><td>Output Voltage</td><td>3.30 V</td></tr>
+                <tr><td>Efficiency</td><td>&gt;92%</td></tr>
+                <tr><td>Tool</td><td>LTSpice</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="modal2" onclick="closeModal(event, 'modal2')">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal(event, 'modal2')">&times;</span>
+            <h2>DETAIL 02 — ADC & UART TELEMETRY</h2>
+            <p style="margin: 20px 0;">Proteus simulation of ATmega329P ADC sensor interface with UART framing</p>
+            <img src="assets/adc_output.png" alt="ADC Telemetry Output" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
+            <img src="assets/adc_circuit.png" alt="ADC Circuit Schematic" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
+            <table class="dimension-table">
+                <tr><td>ADC Resolution</td><td>10-bit (4.88 mV/step)</td></tr>
+                <tr><td>UART Baud</td><td>9600 bps</td></tr>
+                <tr><td>Packet Format</td><td>PKT_ID | TIME | TEMP | VOLT</td></tr>
+                <tr><td>Tool</td><td>Proteus / AVR-C</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="modal3" onclick="closeModal(event, 'modal3')">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal(event, 'modal3')">&times;</span>
+            <h2>DETAIL 03 — RF LINK BUDGET</h2>
+            <p style="margin: 20px 0;">MATLAB link budget calculator with BER analysis for multiple orbit profiles</p>
+            <img src="assets/rf_analysis.png" alt="RF Link Budget Analysis" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
+            <table class="dimension-table">
+                <tr><td>Carrier Frequency</td><td>437 MHz (UHF)</td></tr>
+                <tr><td>Slant Range</td><td>1450 km (LEO)</td></tr>
+                <tr><td>Eb/N0</td><td>23.65 dB</td></tr>
+                <tr><td>Link Margin</td><td>+14.07 dB</td></tr>
+                <tr><td>Tool</td><td>MATLAB App Designer</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="modal4" onclick="closeModal(event, 'modal4')">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal(event, 'modal4')">&times;</span>
+            <h2>DETAIL 04 — AVIONICS SCHEMATIC</h2>
+            <p style="margin: 20px 0;">KiCad 2-layer PCB design with reverse-polarity protection and decoupled power rails</p>
+            <object data="assets/satellite_schematic.svg" type="image/svg+xml" style="width: 100%; height: 400px; margin: 20px 0; border: 2px solid var(--line-white);"></object>
+            <table class="dimension-table">
+                <tr><td>Microcontroller</td><td>ATmega328P-A</td></tr>
+                <tr><td>Clock</td><td>16 MHz Crystal</td></tr>
+                <tr><td>Power Protection</td><td>1N5819 Reverse Polarity</td></tr>
+                <tr><td>LDO Regulator</td><td>AMS1117-3.3</td></tr>
+                <tr><td>Tool</td><td>KiCad 9</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Set current dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('current-date').textContent = today;
+        document.getElementById('current-date-2').textContent = today;
+        document.getElementById('current-date-3').textContent = today;
+        document.getElementById('current-date-4').textContent = today;
+
+        // Add grid markers
+        const gridContainer = document.querySelector('.grid-markers');
+        const letters = ['A', 'B', 'C', 'D'];
+        const numbers = ['1', '2', '3', '4', '5', '6'];
+        
+        letters.forEach((letter, i) => {
+            const marker = document.createElement('div');
+            marker.className = 'grid-marker';
+            marker.textContent = letter;
+            marker.style.left = '10px';
+            marker.style.top = `${20 + i * 25}%`;
+            gridContainer.appendChild(marker);
+        });
+
+        numbers.forEach((num, i) => {
+            const marker = document.createElement('div');
+            marker.className = 'grid-marker';
+            marker.textContent = num;
+            marker.style.top = '10px';
+            marker.style.left = `${15 + i * 14}%`;
+            gridContainer.appendChild(marker);
+        });
+
+        // Link budget calculator
+        const freqSlider = document.getElementById('freq-slider');
+        const rangeSlider = document.getElementById('range-slider');
+        const rateSlider = document.getElementById('rate-slider');
+        const profileSlider = document.getElementById('profile-slider');
+
+        function calculateLinkBudget() {
+            const freq = parseFloat(freqSlider.value) * 1e6; // Hz
+            const range = parseFloat(rangeSlider.value) * 1000; // meters
+            const rate = parseFloat(rateSlider.value); // bps
+            const profile = parseInt(profileSlider.value);
+
+            // Update display values
+            document.getElementById('freq-value').textContent = `${(freq / 1e6).toFixed(0)} MHz`;
+            document.getElementById('range-value').textContent = `${(range / 1000).toFixed(0)} km`;
+            document.getElementById('rate-value').textContent = `${(rate / 1000).toFixed(1)} kbps`;
+            
+            const profiles = ['CUBESAT UHF', 'LEO S-BAND', 'GEO KU-BAND'];
+            document.getElementById('profile-value').textContent = profiles[profile];
+
+            // Physics constants
+            const c = 3e8; // speed of light
+            const lambda = c / freq;
+            const k = 1.38e-23; // Boltzmann constant
+            const T0 = 290; // reference temperature
+
+            // Mission profile parameters
+            const txPower = [0.5, 2, 5][profile]; // W
+            const txLoss = 1.5; // dB
+            const txGain = [2, 5, 40][profile]; // dBi
+            const rxGain = [2, 5, 50][profile]; // dBi
+            const sysNoiseTemp = [500, 300, 150][profile]; // K
+            const miscLoss = 2; // dB
+            const ebnoReq = 9.6; // dB for BPSK, BER ~1e-5
+
+            // Calculate EIRP
+            const ptxDbw = 10 * Math.log10(txPower);
+            const eirp = ptxDbw - txLoss + txGain;
+
+            // Calculate FSPL
+            const fspl = 20 * Math.log10(4 * Math.PI * range / lambda);
+
+            // Calculate C/N0
+            const gt = rxGain - 10 * Math.log10(sysNoiseTemp / T0);
+            const cn0 = eirp - fspl - miscLoss + gt + 228.6;
+
+            // Calculate Eb/N0
+            const ebn0 = cn0 - 10 * Math.log10(rate);
+
+            // Calculate BER (approximation for BPSK)
+            const ebn0Linear = Math.pow(10, ebn0 / 10);
+            const ber = 0.5 * erfc(Math.sqrt(ebn0Linear));
+
+            // Calculate link margin
+            const margin = ebn0 - ebnoReq;
+
+            // Update table
+            document.getElementById('eirp-value').textContent = `${eirp.toFixed(2)} dBW`;
+            document.getElementById('fspl-value').textContent = `${fspl.toFixed(1)} dB`;
+            document.getElementById('cn0-value').textContent = `${cn0.toFixed(1)} dB-Hz`;
+            document.getElementById('ebn0-value').textContent = `${ebn0.toFixed(2)} dB`;
+            document.getElementById('ber-value').textContent = ber.toExponential(2);
+            document.getElementById('margin-value').textContent = `${margin >= 0 ? '+' : ''}${margin.toFixed(2)} dB`;
+
+            // Update link closure indicator
+            const closureBox = document.getElementById('link-closure-box');
+            if (margin >= 3) {
+                closureBox.setAttribute('fill', '#FFD23F');
+            } else {
+                closureBox.setAttribute('fill', '#F2F6FA');
+            }
+
+            // Update operating point on BER curve
+            const opPoint = document.getElementById('operating-point');
+            const x = 100 + (ebn0 / 30) * 800; // Map 0-30 dB to canvas
+            const y = 350 - Math.log10(Math.max(ber, 1e-12)) * 30; // Log scale for BER
+            opPoint.setAttribute('cx', Math.max(100, Math.min(900, x)));
+            opPoint.setAttribute('cy', Math.max(50, Math.min(350, y)));
+        }
+
+        // Complementary error function approximation
+        function erfc(x) {
+            const t = 1 / (1 + 0.5 * Math.abs(x));
+            const tau = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+            return x >= 0 ? tau : 2 - tau;
+        }
+
+        // Add event listeners
+        freqSlider.addEventListener('input', calculateLinkBudget);
+        rangeSlider.addEventListener('input', calculateLinkBudget);
+        rateSlider.addEventListener('input', calculateLinkBudget);
+        profileSlider.addEventListener('input', calculateLinkBudget);
+
+        // Initial calculation
+        calculateLinkBudget();
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(event, modalId) {
+            if (event.target === document.getElementById(modalId) || event.target.classList.contains('modal-close')) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+        }
+
+        // Contact form submission
+        function submitForm() {
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const mission = document.getElementById('contact-mission').value;
+            const message = document.getElementById('contact-message').value;
+
+            if (name && email && mission && message) {
+                const stamp = document.getElementById('received-stamp');
+                const stampDate = document.getElementById('stamp-date');
+                stampDate.textContent = today;
+                stamp.classList.add('visible');
+
+                setTimeout(() => {
+                    stamp.classList.remove('visible');
+                    document.getElementById('contact-name').value = '';
+                    document.getElementById('contact-email').value = '';
+                    document.getElementById('contact-mission').value = '';
+                    document.getElementById('contact-message').value = '';
+                }, 3000);
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        // Intersection Observer for Sheet 2 animation trigger
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.target.id === 'sheet2' && entry.isIntersecting) {
+                    calculateLinkBudget();
+                }
+            });
+        }, { threshold: 0.1 });
+
+        observer.observe(document.getElementById('sheet2'));
+    </script>
+</body>
+</html>
