@@ -1,1128 +1,1891 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VANSIA AVIONICS & SPACE SYSTEMS | Satellite Sensor Node Blueprint</title>
-    <style>
-        :root {
-            --blueprint-blue: #1B4F9C;
-            --fold-shadow: #0E2F66;
-            --line-white: #F2F6FA;
-            --accent-yellow: #FFD23F;
-            --paper-texture: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><filter id="turb"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="200" height="200" filter="url(%23turb)" opacity="0.08"/></svg>');
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DHRUVRAJSINH VANSIA — Satellite Avionics &amp; Space Systems Blueprint</title>
+  <style>
+    :root {
+      --bp-blue: #1B4F9C;
+      --bp-shadow: #0E2F66;
+      --bp-light: #255EB0;
+      --bp-white: #F2F6FA;
+      --bp-yellow: #FFD23F;
+      --font-tech: "Arial Narrow", "DIN Alternate", "Roboto Mono", Menlo, Consolas, monospace;
+      --font-note: Georgia, "Times New Roman", serif;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            font-family: "Arial Narrow", "DIN Alternate", "Roboto Mono", Menlo, Consolas, monospace;
-            background: var(--blueprint-blue);
-            background-image: var(--paper-texture);
-            color: var(--line-white);
-            line-height: 1.5;
-            overflow-x: hidden;
-        }
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bp-blue);
+    }
 
-        .sheet {
-            min-height: 100vh;
-            padding: 40px 60px;
-            position: relative;
-            border-bottom: 2px solid var(--fold-shadow);
-        }
+    body {
+      font-family: var(--font-tech);
+      background-color: var(--bp-blue);
+      color: var(--bp-white);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.45;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .sheet::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, transparent 48%, var(--fold-shadow) 50%, transparent 52%);
-            pointer-events: none;
-            opacity: 0.3;
-        }
+    /* Cyanotype Chemical Unevenness & Paper Fibre Overlay */
+    .cyanotype-texture {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.16;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.95  0 0 0 0 0.97  0 0 0 0 1  0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23f)'/%3E%3C/svg%3E");
+    }
 
-        .border-frame {
-            border: 3px solid var(--line-white);
-            height: 100%;
-            padding: 30px;
-            position: relative;
-        }
+    /* Top Blueprint Navigation Bar */
+    .sheet-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(14, 47, 102, 0.92);
+      backdrop-filter: blur(4px);
+      border-bottom: 1.5px solid var(--bp-white);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-        .grid-markers {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-        }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 0.14em;
+    }
 
-        .grid-marker {
-            position: absolute;
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            opacity: 0.6;
-        }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--line-white);
-            padding-bottom: 20px;
-        }
+    .nav-links a {
+      color: var(--bp-white);
+      text-decoration: none;
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      border: 1px solid rgba(242, 246, 250, 0.5);
+      transition: all 0.2s ease;
+    }
 
-        .header h1 {
-            font-size: 2.5rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      border-color: var(--bp-yellow);
+      color: var(--bp-yellow);
+      outline: 1px dashed var(--bp-yellow);
+      outline-offset: 2px;
+    }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-style: italic;
-            font-family: Georgia, serif;
-        }
+    /* Blueprint Sheet Container */
+    .sheet {
+      position: relative;
+      z-index: 2;
+      padding: 28px 36px;
+      border-bottom: 4px solid var(--bp-shadow);
+      background:
+        radial-gradient(circle at 20% 25%, rgba(37, 94, 176, 0.45), transparent 55%),
+        radial-gradient(circle at 80% 75%, rgba(14, 47, 102, 0.45), transparent 60%),
+        var(--bp-blue);
+    }
 
-        .title-block {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            border: 2px solid var(--line-white);
-            padding: 15px;
-            min-width: 250px;
-            background: rgba(14, 47, 102, 0.5);
-        }
+    /* Orthogonal Paper Fold Creases */
+    .sheet::before,
+    .sheet::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+    }
 
-        .title-block table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
+    .sheet::before {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: linear-gradient(90deg, rgba(14, 47, 102, 0.55), rgba(242, 246, 250, 0.12), rgba(14, 47, 102, 0.35));
+    }
 
-        .title-block td {
-            padding: 4px 8px;
-            border: 1px solid var(--line-white);
-        }
+    .sheet::after {
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 3px;
+      background: linear-gradient(180deg, rgba(14, 47, 102, 0.5), rgba(242, 246, 250, 0.1), rgba(14, 47, 102, 0.35));
+    }
 
-        .title-block td:first-child {
-            font-weight: bold;
-            width: 40%;
-        }
+    /* Masked Print Border & Zone Margin */
+    .print-margin {
+      border: 1px solid rgba(242, 246, 250, 0.35);
+      padding: 18px;
+      position: relative;
+      background: rgba(37, 94, 176, 0.14);
+    }
 
-        .logo-container {
-            position: absolute;
-            top: 40px;
-            right: 60px;
-            width: 80px;
-            height: 80px;
-        }
+    .border-frame {
+      border: 2.5px solid var(--bp-white);
+      padding: 26px 26px 145px 26px;
+      position: relative;
+    }
 
-        .satellite-emblem {
-            animation: hover 3s ease-in-out infinite;
-        }
+    /* Zone Letters & Numbers */
+    .zone-top, .zone-bottom {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.68rem;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+    .zone-top { top: 3px; }
+    .zone-bottom { bottom: 3px; }
 
-        @keyframes hover {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+    .zone-left, .zone-right {
+      position: absolute;
+      top: 18px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      font-size: 0.68rem;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+    .zone-left { left: 5px; }
+    .zone-right { right: 5px; }
 
-        .main-drawing {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto 40px;
-        }
+    /* Handwritten Builder Margin Notes */
+    .pencilled-note {
+      font-family: var(--font-note);
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      color: var(--bp-white);
+      opacity: 0.92;
+      font-size: 0.92rem;
+    }
 
-        .main-drawing svg {
-            width: 100%;
-            height: auto;
-        }
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
 
-        .dimension-table {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            border: 2px solid var(--line-white);
-            border-collapse: collapse;
-        }
+    /* Sheet Header */
+    .sheet-header {
+      border-bottom: 2px solid var(--bp-white);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
-        .dimension-table th,
-        .dimension-table td {
-            border: 1px solid var(--line-white);
-            padding: 12px;
-            text-align: left;
-            font-size: 0.9rem;
-        }
+    .sheet-header h1 {
+      font-size: clamp(1.5rem, 3.2vw, 2.65rem);
+      letter-spacing: 0.16em;
+      font-weight: 700;
+      line-height: 1.15;
+    }
 
-        .dimension-table th {
-            background: rgba(14, 47, 102, 0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
+    .sheet-header h2 {
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+      letter-spacing: 0.14em;
+    }
 
-        .dimension-table tr:hover {
-            background: rgba(255, 210, 63, 0.1);
-        }
+    .subtitle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
 
-        .slider-container {
-            margin: 30px 0;
-        }
+    /* Hovering Orbital Kestrel Emblem */
+    .kestrel-emblem {
+      width: 72px;
+      height: 54px;
+      flex-shrink: 0;
+    }
 
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
+    .kestrel-wing-left {
+      transform-origin: 36px 26px;
+      animation: wingFlickerL 2.8s ease-in-out infinite;
+    }
 
-        .slider-value {
-            color: var(--accent-yellow);
-            font-weight: bold;
-        }
+    .kestrel-wing-right {
+      transform-origin: 36px 26px;
+      animation: wingFlickerR 2.8s ease-in-out infinite;
+    }
 
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            background: var(--fold-shadow);
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-        }
+    @keyframes wingFlickerL {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-7deg); }
+      50% { transform: rotate(3deg); }
+      75% { transform: rotate(-5deg); }
+    }
 
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--accent-yellow);
-            cursor: pointer;
-            border: 2px solid var(--line-white);
-        }
+    @keyframes wingFlickerR {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(7deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(5deg); }
+    }
 
-        .detail-callout {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
+    /* Hero Layout Grid (Sheet 1) */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
 
-        .detail-circle {
-            border: 3px solid var(--line-white);
-            border-radius: 50%;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    .drawing-stage {
+      border: 1.5px solid rgba(242, 246, 250, 0.75);
+      background: rgba(14, 47, 102, 0.28);
+      position: relative;
+      padding: 12px;
+      cursor: crosshair;
+    }
 
-        .detail-circle:hover {
-            border-color: var(--accent-yellow);
-            background: rgba(255, 210, 63, 0.1);
-        }
+    .drawing-stage svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
-        .detail-circle h3 {
-            font-size: 0.9rem;
-            letter-spacing: 0.08em;
-        }
+    /* Crosshair Coordinate Readout */
+    .coord-readout {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      font-size: 0.72rem;
+      background: rgba(14, 47, 102, 0.85);
+      border: 1px solid var(--bp-white);
+      padding: 3px 8px;
+      pointer-events: none;
+    }
 
-        .timeline {
-            margin: 40px 0;
-        }
+    /* Tube/Subsystem Leader Callout Banner */
+    .spec-callout-bar {
+      margin-top: 10px;
+      border: 1px dashed var(--bp-yellow);
+      background: rgba(14, 47, 102, 0.7);
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      color: var(--bp-yellow);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
 
-        .timeline-bar {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-        }
+    .subsystem-group {
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
 
-        .timeline-marker {
-            width: 15px;
-            height: 15px;
-            background: var(--accent-yellow);
-            border-radius: 50%;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
+    .subsystem-group:hover .sub-box,
+    .subsystem-group:focus .sub-box,
+    .subsystem-group.active .sub-box {
+      stroke: var(--bp-yellow);
+      stroke-width: 2.8;
+    }
 
-        .timeline-content {
-            flex: 1;
-            border-left: 2px solid var(--line-white);
-            padding-left: 20px;
-            padding-bottom: 20px;
-        }
+    .dim-group.highlighted line,
+    .dim-group.highlighted path {
+      stroke: var(--bp-yellow) !important;
+      stroke-width: 2.2 !important;
+    }
 
-        .contact-form {
-            max-width: 600px;
-            margin: 40px auto;
-        }
+    .dim-group.highlighted text {
+      fill: var(--bp-yellow) !important;
+      font-weight: bold;
+    }
 
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: transparent;
-            border: 2px solid var(--line-white);
-            color: var(--line-white);
-            font-family: inherit;
-            font-size: 1rem;
-        }
+    /* Schedule Table */
+    .bp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      border: 1.5px solid var(--bp-white);
+    }
 
-        .contact-form button {
-            background: var(--accent-yellow);
-            color: var(--fold-shadow);
-            border: none;
-            padding: 15px 40px;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    .bp-table th,
+    .bp-table td {
+      border: 1px solid rgba(242, 246, 250, 0.65);
+      padding: 7px 9px;
+      text-align: left;
+    }
 
-        .contact-form button:hover {
-            background: var(--line-white);
-        }
+    .bp-table th {
+      background: rgba(14, 47, 102, 0.75);
+      letter-spacing: 0.1em;
+      font-size: 0.72rem;
+    }
 
-        .stamp {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            border: 5px solid var(--accent-yellow);
-            padding: 30px;
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent-yellow);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
+    .bp-table tbody tr {
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
 
-        .stamp.visible {
-            opacity: 1;
-        }
+    .bp-table tbody tr:hover,
+    .bp-table tbody tr.active-row {
+      background: rgba(255, 210, 63, 0.18);
+      color: var(--bp-yellow);
+    }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(14, 47, 102, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+    /* Engineering Title Block (Lower Right of Every Sheet) */
+    .title-block {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: min(430px, calc(100% - 32px));
+      border: 2px solid var(--bp-white);
+      background: rgba(14, 47, 102, 0.88);
+      font-size: 0.68rem;
+      z-index: 10;
+    }
 
-        .modal-content {
-            background: var(--blueprint-blue);
-            border: 3px solid var(--accent-yellow);
-            padding: 40px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto;
-        }
+    .title-block-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+    }
 
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 2rem;
-            color: var(--line-white);
-            cursor: pointer;
-        }
+    .tb-cell {
+      border: 1px solid var(--bp-white);
+      padding: 4px 8px;
+    }
 
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
+    .tb-label {
+      display: block;
+      font-size: 0.58rem;
+      opacity: 0.75;
+    }
 
-        @media (max-width: 768px) {
-            .sheet {
-                padding: 20px;
-            }
+    .tb-val {
+      font-weight: bold;
+      letter-spacing: 0.09em;
+    }
 
-            .header h1 {
-                font-size: 1.5rem;
-            }
+    .tb-rev-yellow {
+      color: var(--bp-yellow);
+    }
 
-            .title-block {
-                position: relative;
-                bottom: auto;
-                right: auto;
-                margin-top: 40px;
-            }
-        }
-    </style>
+    /* SHEET 2: Configurator Layout */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .pinned-canvas-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Custom Scale-Rule Sliders */
+    .scale-control {
+      border: 1px solid rgba(242, 246, 250, 0.65);
+      background: rgba(14, 47, 102, 0.45);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .scale-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+
+    .scale-readout {
+      color: var(--bp-yellow);
+      font-weight: bold;
+      font-size: 0.92rem;
+    }
+
+    .scale-rule-wrap {
+      position: relative;
+      padding: 6px 0 14px 0;
+    }
+
+    .scale-rule-wrap input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: var(--bp-white);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .scale-rule-wrap input[type="range"]:focus-visible {
+      outline: 1px dashed var(--bp-yellow);
+      outline-offset: 6px;
+    }
+
+    .scale-rule-wrap input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 22px;
+      background: var(--bp-yellow);
+      border: 1.5px solid var(--bp-shadow);
+      cursor: ew-resize;
+    }
+
+    .scale-rule-wrap input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 22px;
+      background: var(--bp-yellow);
+      border: 1.5px solid var(--bp-shadow);
+      border-radius: 0;
+      cursor: ew-resize;
+    }
+
+    .tick-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.65rem;
+      opacity: 0.8;
+      border-top: 1px dashed rgba(242, 246, 250, 0.45);
+      padding-top: 3px;
+    }
+
+    /* Mission Profile Stamped Radio Buttons */
+    .profile-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .stamp-btn {
+      background: transparent;
+      color: var(--bp-white);
+      border: 1.5px solid var(--bp-white);
+      padding: 8px 6px;
+      font-family: var(--font-tech);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .stamp-btn:hover {
+      border-color: var(--bp-yellow);
+      color: var(--bp-yellow);
+    }
+
+    .stamp-btn.active {
+      background: var(--bp-yellow);
+      color: var(--bp-shadow);
+      border-color: var(--bp-yellow);
+      font-weight: bold;
+    }
+
+    .stamp-btn:focus-visible {
+      outline: 2px dashed var(--bp-yellow);
+      outline-offset: 3px;
+    }
+
+    /* Closure Check Box */
+    .closure-box {
+      border: 1.5px solid var(--bp-white);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(14, 47, 102, 0.55);
+      margin-bottom: 12px;
+    }
+
+    .check-square {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--bp-yellow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--bp-yellow);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* Flash Yellow on Value Change */
+    @keyframes flashYellow {
+      0% { color: var(--bp-yellow); text-shadow: 0 0 8px rgba(255, 210, 63, 0.8); }
+      100% { color: var(--bp-white); text-shadow: none; }
+    }
+
+    .val-flash {
+      animation: flashYellow 0.65s ease-out;
+    }
+
+    /* UART Live Telemetry Strip */
+    .uart-strip {
+      font-size: 0.72rem;
+      border: 1px solid rgba(242, 246, 250, 0.6);
+      background: rgba(14, 47, 102, 0.75);
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Revisions Log */
+    .revisions-wrap {
+      max-height: 175px;
+      overflow-y: auto;
+      border: 1px solid rgba(242, 246, 250, 0.6);
+    }
+
+    /* SHEET 3: Circular Detail Callouts */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 22px;
+      margin-top: 18px;
+    }
+
+    .detail-card {
+      border: 1.5px solid rgba(242, 246, 250, 0.65);
+      background: rgba(14, 47, 102, 0.35);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    .detail-card:hover {
+      border-color: var(--bp-yellow);
+    }
+
+    .loupe-circle {
+      width: 176px;
+      height: 176px;
+      border-radius: 50%;
+      border: 2.5px solid var(--bp-white);
+      background: rgba(27, 79, 156, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .detail-card:hover .loupe-circle {
+      border-color: var(--bp-yellow);
+      transform: scale(1.03);
+    }
+
+    .loupe-badge {
+      position: absolute;
+      top: 10px;
+      background: var(--bp-shadow);
+      border: 1px solid var(--bp-yellow);
+      color: var(--bp-yellow);
+      font-size: 0.65rem;
+      padding: 1px 7px;
+    }
+
+    /* SHEET 4: Gantt Timeline & Stamped Form */
+    .gantt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 0.76rem;
+    }
+
+    .gantt-table th,
+    .gantt-table td {
+      border: 1px solid rgba(242, 246, 250, 0.55);
+      padding: 8px 10px;
+    }
+
+    .gantt-track {
+      width: 100%;
+      height: 16px;
+      background: rgba(14, 47, 102, 0.6);
+      border: 1px solid rgba(242, 246, 250, 0.4);
+      position: relative;
+    }
+
+    .gantt-bar {
+      position: absolute;
+      top: 1px;
+      bottom: 1px;
+      background: var(--bp-white);
+    }
+
+    .gantt-bar.active-phase {
+      background: var(--bp-yellow);
+    }
+
+    .sheet4-bottom {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .inquiry-form {
+      border: 2px solid var(--bp-white);
+      padding: 18px;
+      background: rgba(14, 47, 102, 0.45);
+      position: relative;
+    }
+
+    .form-row {
+      margin-bottom: 12px;
+    }
+
+    .form-row label {
+      display: block;
+      font-size: 0.7rem;
+      margin-bottom: 4px;
+      opacity: 0.85;
+    }
+
+    .form-row input,
+    .form-row textarea {
+      width: 100%;
+      background: rgba(27, 79, 156, 0.55);
+      border: 1.5px solid var(--bp-white);
+      color: var(--bp-white);
+      font-family: var(--font-tech);
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+    }
+
+    .form-row input:focus,
+    .form-row textarea:focus {
+      outline: 2px dashed var(--bp-yellow);
+      outline-offset: 2px;
+      border-color: var(--bp-yellow);
+    }
+
+    .cta-yellow {
+      background: var(--bp-yellow);
+      color: var(--bp-shadow);
+      border: 2px solid var(--bp-yellow);
+      padding: 11px 22px;
+      font-family: var(--font-tech);
+      font-weight: bold;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cta-yellow:hover {
+      background: transparent;
+      color: var(--bp-yellow);
+    }
+
+    .cta-yellow:focus-visible {
+      outline: 2px dashed var(--bp-yellow);
+      outline-offset: 4px;
+    }
+
+    /* Ink Stamp Seal on Form Submission */
+    .ink-stamp {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      border: 3px solid var(--bp-yellow);
+      color: var(--bp-yellow);
+      padding: 8px 14px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      letter-spacing: 0.14em;
+      transform: rotate(-9deg) scale(1.15);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      background: rgba(14, 47, 102, 0.85);
+    }
+
+    .ink-stamp.stamped {
+      opacity: 1;
+      transform: rotate(-9deg) scale(1);
+    }
+
+    /* Artifact Inspection Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 47, 102, 0.92);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      background: var(--bp-blue);
+      border: 3px solid var(--bp-yellow);
+      max-width: 860px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--bp-white);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+
+    .artifact-preview {
+      border: 1.5px solid var(--bp-white);
+      background: rgba(14, 47, 102, 0.6);
+      padding: 12px;
+      margin: 14px 0;
+      text-align: center;
+    }
+
+    .artifact-preview img,
+    .artifact-preview iframe {
+      max-width: 100%;
+      max-height: 360px;
+      border: 1px solid rgba(242, 246, 250, 0.4);
+    }
+
+    /* Sequenced First-Load SVG Stroke Animation */
+    .draft-stroke {
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: drawStroke 1.6s ease-out forwards;
+    }
+
+    .draft-delay-1 { animation-delay: 0.2s; }
+    .draft-delay-2 { animation-delay: 0.7s; }
+    .draft-delay-3 { animation-delay: 1.3s; }
+    .draft-delay-4 { animation-delay: 1.9s; }
+
+    @keyframes drawStroke {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .draft-stroke {
+        stroke-dasharray: none !important;
+        stroke-dashoffset: 0 !important;
+        animation: none !important;
+      }
+      .kestrel-wing-left,
+      .kestrel-wing-right,
+      .val-flash {
+        animation: none !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .config-grid,
+      .sheet4-bottom {
+        grid-template-columns: 1fr;
+      }
+      .pinned-canvas-col {
+        position: sticky;
+        top: 46px;
+        z-index: 20;
+        background: var(--bp-blue);
+        padding-bottom: 8px;
+      }
+      .sheet {
+        padding: 14px;
+      }
+      .border-frame {
+        padding: 16px 16px 185px 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- SHEET 1: System Block & General Arrangement -->
-    <section class="sheet" id="sheet1">
-        <div class="border-frame">
-            <div class="grid-markers">
-                <!-- Grid markers will be added by JS -->
+  <div class="cyanotype-texture" aria-hidden="true"></div>
+
+  <!-- Top Sheet Index Navigation -->
+  <nav class="sheet-nav" aria-label="Blueprint Sheet Navigation">
+    <div class="nav-brand">
+      <span>DWG SET: VSN-2026</span>
+      <span style="color: var(--bp-yellow);">|</span>
+      <span>DHRUVRAJSINH VANSIA — SPACE SYSTEMS</span>
+    </div>
+    <div class="nav-links">
+      <a href="#sheet1">SHEET 1: ELEVATION</a>
+      <a href="#sheet2">SHEET 2: MEASURE &amp; LINK</a>
+      <a href="#sheet3">SHEET 3: SUBSYSTEM DETAILS</a>
+      <a href="#sheet4">SHEET 4: ORDER OF WORK</a>
+    </div>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- SHEET 1: HERO — GENERAL ARRANGEMENT & TELEMETRY SCHEDULE              -->
+  <!-- ===================================================================== -->
+  <section class="sheet" id="sheet1">
+    <div class="print-margin">
+      <div class="zone-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-bottom"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-left"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+      <div class="zone-right"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+
+      <div class="border-frame">
+        <header class="sheet-header">
+          <div>
+            <h1>SATELLITE SYSTEMS DRAWN TO MEASURE</h1>
+            <div class="subtitle-row">
+              <p class="pencilled-note">One engineer. Four subsystems. End-to-end telemetry from 12V bus to ground station.</p>
+            </div>
+          </div>
+
+          <!-- Hovering Orbital Kestrel Logo -->
+          <svg class="kestrel-emblem" viewBox="0 0 72 54" role="img" aria-label="Hovering Orbital Kestrel Emblem">
+            <g stroke="#F2F6FA" fill="none" stroke-width="1.5" vector-effect="non-scaling-stroke">
+              <!-- Fuselage / Satellite Bus Body -->
+              <polygon points="36,14 40,26 36,42 32,26" fill="rgba(242,246,250,0.15)" />
+              <circle cx="36" cy="21" r="2.2" fill="#FFD23F" stroke="none" />
+              <!-- Tail Feathers -->
+              <line x1="34" y1="40" x2="30" y2="49" />
+              <line x1="36" y1="42" x2="36" y2="51" />
+              <line x1="38" y1="40" x2="42" y2="49" />
+              <!-- Left & Right Swept Wings / Solar Arrays -->
+              <path class="kestrel-wing-left" d="M32,24 L14,15 L4,23 L21,29 L32,28" />
+              <path class="kestrel-wing-right" d="M40,24 L58,15 L68,23 L51,29 L40,28" />
+            </g>
+          </svg>
+        </header>
+
+        <div class="hero-grid">
+          <!-- Interactive Technical Elevation Drawing -->
+          <div>
+            <div class="drawing-stage" id="hero-stage">
+              <div class="coord-readout tabular" id="coord-readout">DATUM X: +000.0 mm | Y: +000.0 mm</div>
+
+              <svg id="hero-svg" viewBox="0 0 820 460" role="img" aria-label="Satellite Sensor Node Integrated Architecture Elevation">
+                <defs>
+                  <pattern id="groundHatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                    <line x1="0" y1="0" x2="0" y2="10" stroke="#F2F6FA" stroke-width="1" opacity="0.55" />
+                  </pattern>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#F2F6FA" />
+                  </marker>
+                  <marker id="arrowYellow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#FFD23F" />
+                  </marker>
+                </defs>
+
+                <!-- 1. Dash-Dot Centerlines -->
+                <g stroke="#F2F6FA" stroke-width="0.9" stroke-dasharray="14,4,2,4" opacity="0.65" class="draft-stroke">
+                  <line x1="25" y1="230" x2="795" y2="230" />
+                  <line x1="150" y1="65" x2="150" y2="395" />
+                  <line x1="360" y1="65" x2="360" y2="395" />
+                  <line x1="555" y1="65" x2="555" y2="395" />
+                  <line x1="715" y1="45" x2="715" y2="395" />
+                </g>
+
+                <!-- Hatched Ground Reference Datum -->
+                <rect x="35" y="388" width="750" height="12" fill="url(#groundHatch)" stroke="none" />
+                <line x1="35" y1="388" x2="785" y2="388" stroke="#F2F6FA" stroke-width="1.6" />
+                <text x="42" y="414" fill="#F2F6FA" font-size="10" letter-spacing="1.5">CHASSIS GROUND REFERENCE PLANE (GND DATUM 0.00V)</text>
+
+                <!-- 2. Subsystem 1: 12V -> 3.3V Buck & LDO Power Stage -->
+                <g class="subsystem-group" tabindex="0" data-spec="SUBSYSTEM 01: BUCK CONVERTER + LDO STAGE — 12.0V BUS IN → 3.30V REGULATED RAIL, >92% EFFICIENCY (LTSPICE &amp; KICAD)">
+                  <rect class="sub-box draft-stroke draft-delay-1" x="65" y="150" width="170" height="160" fill="rgba(27,79,156,0.45)" stroke="#F2F6FA" stroke-width="2" />
+                  <text x="150" y="138" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">01. POWER BUS</text>
+                  <!-- Inductor & Switch Schematic Symbol -->
+                  <path d="M85,205 L105,205 Q112,192 119,205 Q126,192 133,205 Q140,192 147,205 L170,205" fill="none" stroke="#F2F6FA" stroke-width="1.6" />
+                  <rect x="170" y="191" width="44" height="28" fill="none" stroke="#F2F6FA" stroke-width="1.4" />
+                  <text x="192" y="209" text-anchor="middle" fill="#F2F6FA" font-size="9">3.3V</text>
+                  <!-- Bulk Capacitor Plates -->
+                  <line x1="126" y1="205" x2="126" y2="238" stroke="#F2F6FA" stroke-width="1.3" />
+                  <line x1="116" y1="238" x2="136" y2="238" stroke="#F2F6FA" stroke-width="2" />
+                  <line x1="116" y1="245" x2="136" y2="245" stroke="#F2F6FA" stroke-width="2" />
+                  <line x1="126" y1="245" x2="126" y2="275" stroke="#F2F6FA" stroke-width="1.3" />
+                  <text x="150" y="295" text-anchor="middle" fill="#F2F6FA" font-size="10">12V→3.3V | &gt;92% EFF</text>
+                </g>
+
+                <!-- Power Bus Interconnect -->
+                <line x1="235" y1="205" x2="275" y2="205" stroke="#F2F6FA" stroke-width="2.2" marker-end="url(#arrow)" class="draft-stroke draft-delay-2" />
+
+                <!-- 3. Subsystem 2: ATmega328P / ATmega329P Avionics MCU Core -->
+                <g class="subsystem-group" tabindex="0" data-spec="SUBSYSTEM 02: AVIONICS MCU CORE — ATMEGA328P-A / 329P, 16 MHZ CRYSTAL, DECOUPLED AVCC/AREF, AVR-ISP HEADER">
+                  <rect class="sub-box draft-stroke draft-delay-1" x="275" y="135" width="170" height="190" fill="rgba(27,79,156,0.45)" stroke="#F2F6FA" stroke-width="2" />
+                  <text x="360" y="123" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">02. AVIONICS MCU</text>
+                  <!-- TQFP Chip Outline + Pins -->
+                  <rect x="328" y="178" width="64" height="64" fill="none" stroke="#F2F6FA" stroke-width="1.8" />
+                  <circle cx="336" cy="186" r="2.5" fill="#FFD23F" />
+                  <text x="360" y="213" text-anchor="middle" fill="#F2F6FA" font-size="9.5">ATMEGA</text>
+                  <text x="360" y="225" text-anchor="middle" fill="#F2F6FA" font-size="8.5">16 MHz</text>
+                  <!-- Pin Ticks -->
+                  <g stroke="#F2F6FA" stroke-width="1.2">
+                    <line x1="318" y1="190" x2="328" y2="190" /><line x1="318" y1="202" x2="328" y2="202" />
+                    <line x1="318" y1="214" x2="328" y2="214" /><line x1="318" y1="226" x2="328" y2="226" />
+                    <line x1="392" y1="190" x2="402" y2="190" /><line x1="392" y1="202" x2="402" y2="202" />
+                    <line x1="392" y1="214" x2="402" y2="214" /><line x1="392" y1="226" x2="402" y2="226" />
+                  </g>
+                  <text x="360" y="275" text-anchor="middle" fill="#F2F6FA" font-size="9.5">UART 9600 BPS | ISP</text>
+                  <text x="360" y="295" text-anchor="middle" fill="#F2F6FA" font-size="9.5">AVCC / AREF 100nF</text>
+                </g>
+
+                <!-- Sensor & UART Interconnect -->
+                <line x1="445" y1="215" x2="480" y2="215" stroke="#F2F6FA" stroke-width="2" marker-end="url(#arrow)" class="draft-stroke draft-delay-2" />
+
+                <!-- 4. Subsystem 3: Sensor Payload Suite -->
+                <g class="subsystem-group" tabindex="0" data-spec="SUBSYSTEM 03: TELEMETRY SENSORS — LM35 THERMAL PROBE (ADC0), BUS VOLTAGE DIVIDER (ADC1), I2C ENVIRONMENTAL BUS">
+                  <rect class="sub-box draft-stroke draft-delay-2" x="480" y="150" width="150" height="160" fill="rgba(27,79,156,0.45)" stroke="#F2F6FA" stroke-width="2" />
+                  <text x="555" y="138" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">03. PAYLOAD ADC</text>
+                  <!-- ADC Staircase Quantization Graphic -->
+                  <polyline points="505,248 522,248 522,232 539,232 539,216 556,216 556,200 573,200 573,184 595,184" fill="none" stroke="#FFD23F" stroke-width="1.6" />
+                  <text x="555" y="275" text-anchor="middle" fill="#F2F6FA" font-size="9.5">10-BIT (4.88 mV/LSB)</text>
+                  <text x="555" y="295" text-anchor="middle" fill="#F2F6FA" font-size="9.5">LM35 + BUS + I2C</text>
+                </g>
+
+                <!-- RF Baseband Feed -->
+                <line x1="630" y1="215" x2="660" y2="215" stroke="#F2F6FA" stroke-width="2" marker-end="url(#arrow)" class="draft-stroke draft-delay-2" />
+
+                <!-- 5. Subsystem 4: RF Transceiver & Compass-Swept Radiation Lobes -->
+                <g class="subsystem-group" tabindex="0" data-spec="SUBSYSTEM 04: RF DOWNLINK — 437 MHZ UHF / 2.2 GHZ S-BAND, BPSK/QPSK, EIRP 1.35 DBW, MARGIN +14.07 DB">
+                  <rect class="sub-box draft-stroke draft-delay-2" x="660" y="165" width="110" height="130" fill="rgba(27,79,156,0.45)" stroke="#F2F6FA" stroke-width="2" />
+                  <text x="715" y="153" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">04. RF TX</text>
+                  <!-- Antenna Mast & Dipole -->
+                  <line x1="715" y1="165" x2="715" y2="115" stroke="#F2F6FA" stroke-width="2" />
+                  <line x1="695" y1="115" x2="735" y2="115" stroke="#F2F6FA" stroke-width="2.2" />
+                  <!-- Compass-Swept Radiation Arcs -->
+                  <path class="draft-stroke draft-delay-3" d="M685,96 A38,38 0 0,1 745,96" fill="none" stroke="#F2F6FA" stroke-width="1.3" stroke-dasharray="4,3" />
+                  <path class="draft-stroke draft-delay-3" d="M672,82 A56,56 0 0,1 758,82" fill="none" stroke="#F2F6FA" stroke-width="1.3" stroke-dasharray="4,3" />
+                  <path class="draft-stroke draft-delay-3" d="M658,68 A74,74 0 0,1 772,68" fill="none" stroke="#FFD23F" stroke-width="1.4" stroke-dasharray="5,3" />
+                  <text x="715" y="232" text-anchor="middle" fill="#F2F6FA" font-size="9.5">BPSK/QPSK</text>
+                  <text x="715" y="252" text-anchor="middle" fill="#F2F6FA" font-size="9.5">437 MHz</text>
+                  <text x="715" y="272" text-anchor="middle" fill="#FFD23F" font-size="9.5">+14.07 dB</text>
+                </g>
+
+                <!-- Dotted Ground Station Vector -->
+                <g opacity="0.85" class="draft-stroke draft-delay-4">
+                  <line x1="715" y1="115" x2="788" y2="42" stroke="#F2F6FA" stroke-width="1.2" stroke-dasharray="3,4" />
+                  <path d="M776,34 Q788,46 800,34" fill="none" stroke="#F2F6FA" stroke-width="1.6" />
+                  <line x1="788" y1="40" x2="788" y2="52" stroke="#F2F6FA" stroke-width="1.5" />
+                  <text x="752" y="30" fill="#F2F6FA" font-size="8.5">GS BREMEN</text>
+                </g>
+
+                <!-- Dimension Lines A through J -->
+                <g class="dim-group draft-stroke draft-delay-4" data-dim="A">
+                  <line x1="65" y1="335" x2="235" y2="335" stroke="#F2F6FA" stroke-width="1.1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                  <text x="150" y="350" text-anchor="middle" fill="#F2F6FA" font-size="10">A: 12.0V BUS</text>
+                </g>
+                <g class="dim-group draft-stroke draft-delay-4" data-dim="B">
+                  <line x1="275" y1="348" x2="445" y2="348" stroke="#F2F6FA" stroke-width="1.1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                  <text x="360" y="363" text-anchor="middle" fill="#F2F6FA" font-size="10">B: 3.30V RAIL</text>
+                </g>
+                <g class="dim-group draft-stroke draft-delay-4" data-dim="D">
+                  <line x1="480" y1="335" x2="630" y2="335" stroke="#F2F6FA" stroke-width="1.1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                  <text x="555" y="350" text-anchor="middle" fill="#F2F6FA" font-size="10">D: 10-BIT ADC</text>
+                </g>
+                <g class="dim-group draft-stroke draft-delay-4" data-dim="J">
+                  <line x1="660" y1="348" x2="770" y2="348" stroke="#F2F6FA" stroke-width="1.1" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                  <text x="715" y="363" text-anchor="middle" fill="#F2F6FA" font-size="10">J: +14.07 dB</text>
+                </g>
+              </svg>
             </div>
 
-            <div class="logo-container">
-                <svg class="satellite-emblem" viewBox="0 0 100 100">
-                    <path d="M50 20 L60 40 L80 40 L65 55 L70 75 L50 65 L30 75 L35 55 L20 40 L40 40 Z" 
-                          fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    <circle cx="50" cy="50" r="8" fill="var(--line-white)"/>
-                    <line x1="20" y1="30" x2="80" y2="30" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
-                </svg>
+            <!-- Interactive Leader-Line Spec Readout -->
+            <div class="spec-callout-bar" id="spec-callout" aria-live="polite">
+              <span>HOVER OR TAP ANY SUBSYSTEM BLOCK ABOVE TO INSPECT HARDWARE &amp; SIMULATION SPECS</span>
+              <span class="tabular" style="opacity: 0.8;">[UNIT: MM / DB / V]</span>
+            </div>
+          </div>
+
+          <!-- Schedule of Dimensions & Verified Telemetry -->
+          <div>
+            <p class="pencilled-note" style="margin-bottom: 8px;">Schedule of verified subsystem parameters (hover row to highlight on drawing):</p>
+            <table class="bp-table tabular" id="schedule-table">
+              <thead>
+                <tr>
+                  <th>REF</th>
+                  <th>PARAMETER</th>
+                  <th>SPEC / VALUE</th>
+                  <th>STAGE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-dim="A"><td>A</td><td>PRIMARY BUS INPUT</td><td>12.0 V DC</td><td>BUCK / KICAD</td></tr>
+                <tr data-dim="B"><td>B</td><td>REGULATED LOGIC RAIL</td><td>3.30 V (&plusmn;1%)</td><td>LTSPICE / LDO</td></tr>
+                <tr data-dim="C"><td>C</td><td>SWITCHING EFFICIENCY</td><td>&gt; 92.4 %</td><td>LTSPICE</td></tr>
+                <tr data-dim="D"><td>D</td><td>ADC QUANTIZATION</td><td>10-BIT (4.88 mV)</td><td>PROTEUS</td></tr>
+                <tr data-dim="E"><td>E</td><td>UART TELEMETRY STREAM</td><td>9600 BPS / 1 HZ</td><td>ATMEGA329P</td></tr>
+                <tr data-dim="F"><td>F</td><td>NOMINAL CARRIER FREQ</td><td>437.0 MHZ (UHF)</td><td>MATLAB RF</td></tr>
+                <tr data-dim="G"><td>G</td><td>SLANT RANGE (15&deg; EL)</td><td>1,450 KM (LEO)</td><td>ORBITAL GEOM</td></tr>
+                <tr data-dim="H"><td>H</td><td>TRANSMIT EIRP</td><td>+1.35 DBW</td><td>MATLAB RF</td></tr>
+                <tr data-dim="I"><td>I</td><td>RECEIVED Eb/N0</td><td>23.65 DB</td><td>AWGN MODEL</td></tr>
+                <tr data-dim="J"><td>J</td><td>NOMINAL LINK MARGIN</td><td>+14.07 DB (PASS)</td><td>BER &lt; 10⁻⁵</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Engineering Title Block (Sheet 1) -->
+        <div class="title-block tabular">
+          <div class="title-block-grid">
+            <div class="tb-cell"><span class="tb-label">TITLE</span><span class="tb-val">SATELLITE SENSOR NODE — GEN. ARR.</span></div>
+            <div class="tb-cell"><span class="tb-label">DRAWN BY</span><span class="tb-val">DHRUVRAJSINH VANSIA</span></div>
+            <div class="tb-cell"><span class="tb-label">SCALE</span><span class="tb-val">1:1 / NTS</span></div>
+            <div class="tb-cell"><span class="tb-label">SHEET</span><span class="tb-val">1 OF 4</span></div>
+            <div class="tb-cell"><span class="tb-label">DATE</span><span class="tb-val live-date">2026-11-21</span></div>
+            <div class="tb-cell"><span class="tb-label">DRG NO.</span><span class="tb-val tb-rev-yellow live-drg-no">VSN-2026-REV-A</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- SHEET 2: MEASURE & CONFIGURE — LIVE RF LINK & TELEMETRY SIMULATOR     -->
+  <!-- ===================================================================== -->
+  <section class="sheet" id="sheet2">
+    <div class="print-margin">
+      <div class="zone-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-bottom"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-left"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+      <div class="zone-right"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+
+      <div class="border-frame">
+        <header class="sheet-header">
+          <div>
+            <h2>MEASURE &amp; CONFIGURE: RF LINK &amp; TELEMETRY</h2>
+            <p class="pencilled-note">Adjust orbital range, carrier frequency, or bit rate to watch the downlink geometry and BER operating point re-draft live.</p>
+          </div>
+        </header>
+
+        <div class="config-grid">
+          <!-- Left / Pinned Live Drafting Stage -->
+          <div class="pinned-canvas-col">
+            <div class="drawing-stage">
+              <svg id="config-svg" viewBox="0 0 760 390" role="img" aria-label="Live Orbital Downlink Geometry and BER Waterfall Plot">
+                <!-- Left Half: Orbital Slant Range & Beam Cone Geometry -->
+                <g>
+                  <text x="180" y="24" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">ORBITAL LINK GEOMETRY</text>
+                  <!-- Earth Horizon Arc -->
+                  <path d="M25,355 Q180,295 335,355" fill="none" stroke="#F2F6FA" stroke-width="2" />
+                  <text x="180" y="374" text-anchor="middle" fill="#F2F6FA" font-size="9.5">GROUND STATION RECEIVER (G/T)</text>
+
+                  <!-- Faint Dashed Ghost of REV A Baseline -->
+                  <g opacity="0.35" stroke="#F2F6FA" stroke-dasharray="4,4" fill="none">
+                    <polygon points="180,105 125,326 235,326" stroke-width="1.2" />
+                    <circle cx="180" cy="105" r="7" />
+                    <text x="195" y="98" fill="#F2F6FA" font-size="8.5" stroke="none">REV A BASELINE (1450 KM)</text>
+                  </g>
+
+                  <!-- Live Dynamic Beamwidth Cone & Slant Range Vector -->
+                  <polygon id="live-beam-cone" points="180,105 125,326 235,326" fill="rgba(255, 210, 63, 0.14)" stroke="#FFD23F" stroke-width="1.5" />
+                  <line id="live-slant-line" x1="180" y1="105" x2="180" y2="326" stroke="#F2F6FA" stroke-width="1.4" stroke-dasharray="8,4,2,4" />
+
+                  <!-- Live Satellite Icon -->
+                  <g id="live-sat-node" transform="translate(180, 105)">
+                    <rect x="-12" y="-7" width="24" height="14" fill="#1B4F9C" stroke="#FFD23F" stroke-width="2" />
+                    <line x1="-28" y1="0" x2="-12" y2="0" stroke="#F2F6FA" stroke-width="2" />
+                    <line x1="12" y1="0" x2="28" y2="0" stroke="#F2F6FA" stroke-width="2" />
+                  </g>
+
+                  <text id="svg-range-label" x="192" y="215" fill="#FFD23F" font-size="10">d = 1450 km</text>
+                  <text id="svg-fspl-label" x="192" y="232" fill="#F2F6FA" font-size="9.5">FSPL = 148.48 dB</text>
+                </g>
+
+                <!-- Divider Line -->
+                <line x1="365" y1="20" x2="365" y2="375" stroke="#F2F6FA" stroke-width="1" stroke-dasharray="6,4" opacity="0.5" />
+
+                <!-- Right Half: Exact AWGN BER Waterfall Curve -->
+                <g>
+                  <text x="565" y="24" text-anchor="middle" fill="#F2F6FA" font-size="11" font-weight="bold">AWGN BER WATERFALL (BPSK/QPSK)</text>
+                  <!-- Grid Lines -->
+                  <g stroke="#F2F6FA" stroke-width="0.6" opacity="0.28">
+                    <line x1="420" y1="95" x2="725" y2="95" />
+                    <line x1="420" y1="150" x2="725" y2="150" />
+                    <line x1="420" y1="205" x2="725" y2="205" />
+                    <line x1="420" y1="260" x2="725" y2="260" />
+                    <line x1="420" y1="315" x2="725" y2="315" />
+                    <line x1="496" y1="45" x2="496" y2="335" />
+                    <line x1="572" y1="45" x2="572" y2="335" />
+                    <line x1="648" y1="45" x2="648" y2="335" />
+                  </g>
+
+                  <!-- Axes -->
+                  <line x1="420" y1="335" x2="725" y2="335" stroke="#F2F6FA" stroke-width="1.8" />
+                  <line x1="420" y1="45" x2="420" y2="335" stroke="#F2F6FA" stroke-width="1.8" />
+
+                  <!-- Y-Axis Log Labels -->
+                  <text x="414" y="52" text-anchor="end" fill="#F2F6FA" font-size="8.5">10⁰</text>
+                  <text x="414" y="153" text-anchor="end" fill="#F2F6FA" font-size="8.5">10⁻⁴</text>
+                  <text x="414" y="263" text-anchor="end" fill="#F2F6FA" font-size="8.5">10⁻⁸</text>
+                  <text x="414" y="335" text-anchor="end" fill="#F2F6FA" font-size="8.5">10⁻¹²</text>
+
+                  <!-- X-Axis Eb/N0 Labels -->
+                  <text x="420" y="350" text-anchor="middle" fill="#F2F6FA" font-size="8.5">0</text>
+                  <text x="496" y="350" text-anchor="middle" fill="#F2F6FA" font-size="8.5">4</text>
+                  <text x="572" y="350" text-anchor="middle" fill="#F2F6FA" font-size="8.5">8</text>
+                  <text x="648" y="350" text-anchor="middle" fill="#F2F6FA" font-size="8.5">12</text>
+                  <text x="724" y="350" text-anchor="middle" fill="#F2F6FA" font-size="8.5">16 dB</text>
+                  <text x="572" y="372" text-anchor="middle" fill="#F2F6FA" font-size="9.5">RECEIVED Eb/N0 [DB]</text>
+
+                  <!-- Theoretical Waterfall Path (Populated via JS erfc) -->
+                  <path id="ber-waterfall-path" d="" fill="none" stroke="#F2F6FA" stroke-width="2.2" />
+
+                  <!-- Required Eb/N0 Threshold Line (9.59 dB for 10^-5) -->
+                  <line id="req-threshold-line" x1="602" y1="45" x2="602" y2="335" stroke="#FFD23F" stroke-width="1.1" stroke-dasharray="4,3" />
+                  <text x="606" y="60" fill="#FFD23F" font-size="8">REQ 10⁻⁵</text>
+
+                  <!-- Live Operating Point Marker -->
+                  <circle id="ber-op-circle" cx="680" cy="310" r="6.5" fill="#FFD23F" stroke="#0E2F66" stroke-width="1.5" />
+                  <text id="ber-op-label" x="665" y="295" text-anchor="end" fill="#FFD23F" font-size="9" font-weight="bold">OP: 23.65 dB</text>
+                </g>
+              </svg>
             </div>
 
-            <div class="header">
-                <h1>SATELLITE SYSTEMS DRAWN TO MEASURE</h1>
-                <p>One engineer. Four subsystems. End-to-end telemetry from 12V bus to ground station.</p>
+            <!-- Simulated ATmega329P UART Telemetry Output Frame -->
+            <div class="uart-strip tabular" id="uart-live-frame">
+              <span>UART TX [9600 8N1]:</span>
+              <span style="color: var(--bp-yellow);" id="uart-packet-text">PKT_078 | T+78360ms | TEMP: 18.07°C | BUS: 2.95V | LINK: NOMINAL</span>
             </div>
 
-            <div class="main-drawing">
-                <svg viewBox="0 0 1000 600" id="main-svg">
-                    <!-- Center lines -->
-                    <line x1="50" y1="300" x2="950" y2="300" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="10,5,2,5"/>
-                    <line x1="500" y1="50" x2="500" y2="550" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="10,5,2,5"/>
+            <!-- Calculated Link Budget Table -->
+            <table class="bp-table tabular">
+              <thead>
+                <tr>
+                  <th>EIRP</th>
+                  <th>FSPL</th>
+                  <th>G/T</th>
+                  <th>C/N0</th>
+                  <th>Eb/N0</th>
+                  <th>BER</th>
+                  <th>MARGIN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="out-eirp">+1.35 dBW</td>
+                  <td id="out-fspl">148.48 dB</td>
+                  <td id="out-gt">-14.49 dB/K</td>
+                  <td id="out-cn0">63.48 dB-Hz</td>
+                  <td id="out-ebn0">23.65 dB</td>
+                  <td id="out-ber">3.62e-103</td>
+                  <td id="out-margin" style="color: var(--bp-yellow); font-weight: bold;">+14.07 dB</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-                    <!-- Power Stage -->
-                    <rect x="100" y="200" width="150" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    <text x="175" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">POWER</text>
-                    <text x="175" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">12V→3.3V</text>
-                    <text x="175" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">&gt;92% EFF</text>
-
-                    <!-- Avionics Core -->
-                    <rect x="350" y="200" width="180" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    <text x="440" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">ATMEGA328P</text>
-                    <text x="440" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">16 MHz</text>
-                    <text x="440" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">AVCC/AREF</text>
-
-                    <!-- Sensor Payload -->
-                    <rect x="600" y="200" width="150" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    <text x="675" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">SENSORS</text>
-                    <text x="675" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">LM35, I2C</text>
-                    <text x="675" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">10-bit ADC</text>
-
-                    <!-- RF Chain -->
-                    <rect x="800" y="200" width="120" height="120" fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    <text x="860" y="250" text-anchor="middle" font-size="12" fill="var(--line-white)">RF LINK</text>
-                    <text x="860" y="270" text-anchor="middle" font-size="12" fill="var(--line-white)">UHF/S-Band</text>
-                    <text x="860" y="290" text-anchor="middle" font-size="12" fill="var(--line-white)">437 MHz</text>
-
-                    <!-- Connection lines -->
-                    <line x1="250" y1="260" x2="350" y2="260" stroke="var(--line-white)" stroke-width="2"/>
-                    <line x1="530" y1="260" x2="600" y2="260" stroke="var(--line-white)" stroke-width="2"/>
-                    <line x1="750" y1="260" x2="800" y2="260" stroke="var(--line-white)" stroke-width="2"/>
-
-                    <!-- Antenna radiation pattern -->
-                    <path d="M860 180 Q900 140 940 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
-                    <path d="M860 180 Q900 120 980 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
-                    <path d="M860 180 Q900 100 1020 180" fill="none" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="4,2"/>
-
-                    <!-- Ground station link -->
-                    <line x1="900" y1="160" x2="950" y2="100" stroke="var(--line-white)" stroke-width="1" stroke-dasharray="8,4"/>
-                    <circle cx="950" cy="100" r="5" fill="var(--line-white)"/>
-
-                    <!-- Dimension callouts -->
-                    <text x="175" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">A: 12.0V</text>
-                    <text x="440" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">B: 3.30V</text>
-                    <text x="675" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">D: 10-bit</text>
-                    <text x="860" y="340" text-anchor="middle" font-size="10" fill="var(--line-white)">F: 437 MHz</text>
-                </svg>
+          <!-- Right Column: Custom Scale-Rule Sliders & Revision Log -->
+          <div>
+            <!-- Mission Profile Discrete Selector -->
+            <div class="scale-control">
+              <div class="scale-header">
+                <span>01. ORBITAL MISSION PROFILE</span>
+                <span class="scale-readout" id="val-profile">CUBESAT UHF (BPSK)</span>
+              </div>
+              <div class="profile-buttons" role="group" aria-label="Mission Profile Selector">
+                <button type="button" class="stamp-btn active" data-profile="cubesat">CUBESAT UHF</button>
+                <button type="button" class="stamp-btn" data-profile="leo">LEO S-BAND</button>
+                <button type="button" class="stamp-btn" data-profile="geo">GEO KU-BAND</button>
+              </div>
             </div>
 
-            <table class="dimension-table">
+            <!-- Slider 1: Carrier Frequency -->
+            <div class="scale-control">
+              <div class="scale-header">
+                <label for="slider-freq">02. CARRIER FREQUENCY</label>
+                <span class="scale-readout tabular" id="val-freq">437 MHz</span>
+              </div>
+              <div class="scale-rule-wrap">
+                <input type="range" id="slider-freq" min="145" max="12000" step="1" value="437" />
+                <div class="tick-marks tabular">
+                  <span>145 MHz</span><span>437 UHF</span><span>2200 S-BAND</span><span>12000 Ku</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slider 2: Slant Range -->
+            <div class="scale-control">
+              <div class="scale-header">
+                <label for="slider-range">03. SLANT RANGE (ALTITUDE)</label>
+                <span class="scale-readout tabular" id="val-range">1450 km</span>
+              </div>
+              <div class="scale-rule-wrap">
+                <input type="range" id="slider-range" min="400" max="38500" step="50" value="1450" />
+                <div class="tick-marks tabular">
+                  <span>400 km</span><span>1450 LEO</span><span>15000 MEO</span><span>38500 GEO</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slider 3: Data Rate -->
+            <div class="scale-control">
+              <div class="scale-header">
+                <label for="slider-rate">04. TELEMETRY BIT RATE</label>
+                <span class="scale-readout tabular" id="val-rate">9.6 kbps</span>
+              </div>
+              <div class="scale-rule-wrap">
+                <input type="range" id="slider-rate" min="1.2" max="10000" step="0.4" value="9.6" />
+                <div class="tick-marks tabular">
+                  <span>1.2 kbps</span><span>9.6 kbps</span><span>2000 kbps</span><span>10000 kbps</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Auto-Ticking Link Closure Check Box -->
+            <div class="closure-box">
+              <div>
+                <div style="font-size: 0.78rem; font-weight: bold;">LINK CLOSURE CHECK (&ge; 3.0 DB MARGIN)</div>
+                <div class="pencilled-note" id="closure-remark" style="font-size: 0.82rem;">Nominal closure — clear-sky telemetry margin verified.</div>
+              </div>
+              <div class="check-square" id="closure-check" aria-label="Link closure status">&#10003;</div>
+            </div>
+
+            <!-- Engineering Revisions Log Table -->
+            <div style="margin-bottom: 6px; font-size: 0.75rem; font-weight: bold;">DRAWING REVISIONS LOG (SKIPS I, O, Q)</div>
+            <div class="revisions-wrap">
+              <table class="bp-table tabular" id="revisions-table">
                 <thead>
-                    <tr>
-                        <th>Dimension</th>
-                        <th>Parameter</th>
-                        <th>Value</th>
-                        <th>Verification</th>
-                    </tr>
+                  <tr>
+                    <th>REV</th>
+                    <th>PARAMETER DELTA</th>
+                    <th>ENGINEERING NOTE</th>
+                  </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>A</td>
-                        <td>Bus Input Voltage</td>
-                        <td>12.0 V</td>
-                        <td>LTSpice Simulation</td>
-                    </tr>
-                    <tr>
-                        <td>B</td>
-                        <td>Regulated Rail</td>
-                        <td>3.30 V</td>
-                        <td>LTSpice, KiCad ERC</td>
-                    </tr>
-                    <tr>
-                        <td>C</td>
-                        <td>Buck Efficiency</td>
-                        <td>&gt;92%</td>
-                        <td>LTSpice Power Analysis</td>
-                    </tr>
-                    <tr>
-                        <td>D</td>
-                        <td>ADC Resolution</td>
-                        <td>10-bit (4.88 mV/step)</td>
-                        <td>Proteus Virtual Terminal</td>
-                    </tr>
-                    <tr>
-                        <td>E</td>
-                        <td>UART Baud Rate</td>
-                        <td>9600 bps</td>
-                        <td>Proteus Simulation</td>
-                    </tr>
-                    <tr>
-                        <td>F</td>
-                        <td>Carrier Frequency</td>
-                        <td>437 MHz (UHF)</td>
-                        <td>MATLAB Link Budget</td>
-                    </tr>
-                    <tr>
-                        <td>G</td>
-                        <td>Slant Range</td>
-                        <td>1450 km (LEO)</td>
-                        <td>MATLAB Orbital Model</td>
-                    </tr>
-                    <tr>
-                        <td>H</td>
-                        <td>EIRP</td>
-                        <td>1.35 dBW</td>
-                        <td>MATLAB Link Calculator</td>
-                    </tr>
-                    <tr>
-                        <td>I</td>
-                        <td>Received Eb/N0</td>
-                        <td>23.65 dB</td>
-                        <td>MATLAB BER Analysis</td>
-                    </tr>
-                    <tr>
-                        <td>J</td>
-                        <td>Link Margin</td>
-                        <td>+14.07 dB</td>
-                        <td>MATLAB Link Closure</td>
-                    </tr>
+                <tbody id="revisions-body">
+                  <tr>
+                    <td style="color: var(--bp-yellow);">REV A</td>
+                    <td>BASELINE ISSUE (437 MHz / 1450 km)</td>
+                    <td class="pencilled-note">Initial 3U CubeSat UHF telemetry reference.</td>
+                  </tr>
                 </tbody>
-            </table>
-
-            <div class="title-block">
-                <table>
-                    <tr>
-                        <td>TITLE</td>
-                        <td>SATELLITE SENSOR NODE — INTEGRATED AVIONICS</td>
-                    </tr>
-                    <tr>
-                        <td>DRAWN BY</td>
-                        <td>DHRUVRAJSINH VANSIA</td>
-                    </tr>
-                    <tr>
-                        <td>SCALE</td>
-                        <td>1:1 / NTS</td>
-                    </tr>
-                    <tr>
-                        <td>SHEET</td>
-                        <td id="sheet-num">1 OF 4</td>
-                    </tr>
-                    <tr>
-                        <td>DATE</td>
-                        <td id="current-date">2026-11-21</td>
-                    </tr>
-                    <tr>
-                        <td>DRG NO.</td>
-                        <td id="drwg-no">VSN-2026-REV-A</td>
-                    </tr>
-                </table>
+              </table>
             </div>
+          </div>
         </div>
-    </section>
 
-    <!-- SHEET 2: Live Link Budget Configurator -->
-    <section class="sheet" id="sheet2">
-        <div class="border-frame">
-            <div class="header">
-                <h1>MEASURE & CONFIGURE</h1>
-                <p>Live satellite link budget calculator with real-time physics recalculation</p>
-            </div>
-
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>Carrier Frequency</span>
-                    <span class="slider-value" id="freq-value">437 MHz</span>
-                </div>
-                <input type="range" id="freq-slider" min="145" max="12000" value="437" step="1">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
-                    <span>VHF (145 MHz)</span>
-                    <span>UHF (437 MHz)</span>
-                    <span>S-Band (2400 MHz)</span>
-                    <span>Ku-Band (12000 MHz)</span>
-                </div>
-            </div>
-
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>Slant Range / Altitude</span>
-                    <span class="slider-value" id="range-value">1450 km</span>
-                </div>
-                <input type="range" id="range-slider" min="400" max="38500" value="1450" step="50">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
-                    <span>LEO (400 km)</span>
-                    <span>MEO (2000 km)</span>
-                    <span>GEO (35786 km)</span>
-                </div>
-            </div>
-
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>Data Rate</span>
-                    <span class="slider-value" id="rate-value">9.6 kbps</span>
-                </div>
-                <input type="range" id="rate-slider" min="1200" max="10000000" value="9600" step="1200">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
-                    <span>1.2 kbps</span>
-                    <span>9.6 kbps</span>
-                    <span>100 kbps</span>
-                    <span>10 Mbps</span>
-                </div>
-            </div>
-
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>Mission Profile</span>
-                    <span class="slider-value" id="profile-value">CUBESAT UHF</span>
-                </div>
-                <input type="range" id="profile-slider" min="0" max="2" value="0" step="1">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">
-                    <span>CUBESAT UHF</span>
-                    <span>LEO S-BAND</span>
-                    <span>GEO KU-BAND</span>
-                </div>
-            </div>
-
-            <div class="main-drawing">
-                <svg viewBox="0 0 1000 400" id="link-budget-svg">
-                    <!-- BER Curve -->
-                    <path id="ber-curve" d="M100 350 Q300 350 500 200 T900 50" fill="none" stroke="var(--line-white)" stroke-width="2"/>
-                    
-                    <!-- Operating point marker -->
-                    <circle id="operating-point" cx="700" cy="100" r="8" fill="var(--accent-yellow)"/>
-                    
-                    <!-- Axes -->
-                    <line x1="100" y1="350" x2="900" y2="350" stroke="var(--line-white)" stroke-width="2"/>
-                    <line x1="100" y1="50" x2="100" y2="350" stroke="var(--line-white)" stroke-width="2"/>
-                    
-                    <text x="500" y="390" text-anchor="middle" font-size="12" fill="var(--line-white)">Eb/N0 (dB)</text>
-                    <text x="40" y="200" text-anchor="middle" font-size="12" fill="var(--line-white)" transform="rotate(-90, 40, 200)">BER</text>
-                    
-                    <!-- Link closure indicator -->
-                    <rect x="750" y="300" width="20" height="20" fill="var(--accent-yellow)" id="link-closure-box"/>
-                    <text x="780" y="315" font-size="10" fill="var(--line-white)">LINK CLOSURE ≥ 3.0 dB</text>
-                </svg>
-            </div>
-
-            <table class="dimension-table" id="live-metrics">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Formula</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>EIRP</td>
-                        <td>P_tx - L_tx + G_tx</td>
-                        <td id="eirp-value">1.35 dBW</td>
-                    </tr>
-                    <tr>
-                        <td>FSPL</td>
-                        <td>20log₁₀(4πd/λ)</td>
-                        <td id="fspl-value">155.2 dB</td>
-                    </tr>
-                    <tr>
-                        <td>C/N₀</td>
-                        <td>EIRP - FSPL - L_misc + G/T + 228.6</td>
-                        <td id="cn0-value">48.5 dB-Hz</td>
-                    </tr>
-                    <tr>
-                        <td>Eb/N₀</td>
-                        <td>C/N₀ - 10log₁₀(R_b)</td>
-                        <td id="ebn0-value">23.65 dB</td>
-                    </tr>
-                    <tr>
-                        <td>BER</td>
-                        <td>0.5·erfc(√(10^(Eb/N₀/10)))</td>
-                        <td id="ber-value">1.2×10⁻⁷</td>
-                    </tr>
-                    <tr>
-                        <td>Link Margin</td>
-                        <td>Eb/N₀ - Eb/N₀_req</td>
-                        <td id="margin-value">+14.07 dB</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="title-block">
-                <table>
-                    <tr>
-                        <td>TITLE</td>
-                        <td>LIVE LINK BUDGET CALCULATOR</td>
-                    </tr>
-                    <tr>
-                        <td>DRAWN BY</td>
-                        <td>DHRUVRAJSINH VANSIA</td>
-                    </tr>
-                    <tr>
-                        <td>SCALE</td>
-                        <td>N/A</td>
-                    </tr>
-                    <tr>
-                        <td>SHEET</td>
-                        <td>2 OF 4</td>
-                    </tr>
-                    <tr>
-                        <td>DATE</td>
-                        <td id="current-date-2">2026-11-21</td>
-                    </tr>
-                    <tr>
-                        <td>DRG NO.</td>
-                        <td id="drwg-no-2">VSN-2026-REV-A</td>
-                    </tr>
-                </table>
-            </div>
+        <!-- Engineering Title Block (Sheet 2) -->
+        <div class="title-block tabular">
+          <div class="title-block-grid">
+            <div class="tb-cell"><span class="tb-label">TITLE</span><span class="tb-val">RF LINK &amp; TELEMETRY CONFIGURATOR</span></div>
+            <div class="tb-cell"><span class="tb-label">DRAWN BY</span><span class="tb-val">DHRUVRAJSINH VANSIA</span></div>
+            <div class="tb-cell"><span class="tb-label">SCALE</span><span class="tb-val">PARAMETRIC</span></div>
+            <div class="tb-cell"><span class="tb-label">SHEET</span><span class="tb-val">2 OF 4</span></div>
+            <div class="tb-cell"><span class="tb-label">DATE</span><span class="tb-val live-date">2026-11-21</span></div>
+            <div class="tb-cell"><span class="tb-label">DRG NO.</span><span class="tb-val tb-rev-yellow live-drg-no">VSN-2026-REV-A</span></div>
+          </div>
         </div>
-    </section>
-
-    <!-- SHEET 3: Detail Callouts -->
-    <section class="sheet" id="sheet3">
-        <div class="border-frame">
-            <div class="header">
-                <h1>JOINERY & SUBSYSTEM DETAILS</h1>
-                <p>Four circular detail callouts with engineering artifacts</p>
-            </div>
-
-            <div class="detail-callout">
-                <div class="detail-circle" onclick="openModal('modal1')">
-                    <div>
-                        <h3>DETAIL 01</h3>
-                        <p>Buck Converter</p>
-                        <p style="font-size: 0.8rem; margin-top: 10px;">LTSpice &gt;92% Efficiency</p>
-                    </div>
-                </div>
-
-                <div class="detail-circle" onclick="openModal('modal2')">
-                    <div>
-                        <h3>DETAIL 02</h3>
-                        <p>ADC & UART</p>
-                        <p style="font-size: 0.8rem; margin-top: 10px;">Proteus 10-bit Telemetry</p>
-                    </div>
-                </div>
-
-                <div class="detail-circle" onclick="openModal('modal3')">
-                    <div>
-                        <h3>DETAIL 03</h3>
-                        <p>RF Link Budget</p>
-                        <p style="font-size: 0.8rem; margin-top: 10px;">MATLAB BER Analysis</p>
-                    </div>
-                </div>
-
-                <div class="detail-circle" onclick="openModal('modal4')">
-                    <div>
-                        <h3>DETAIL 04</h3>
-                        <p>Avionics Schematic</p>
-                        <p style="font-size: 0.8rem; margin-top: 10px;">KiCad 2-Layer PCB</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="title-block">
-                <table>
-                    <tr>
-                        <td>TITLE</td>
-                        <td>SUBSYSTEM DETAIL CALLouts</td>
-                    </tr>
-                    <tr>
-                        <td>DRAWN BY</td>
-                        <td>DHRUVRAJSINH VANSIA</td>
-                    </tr>
-                    <tr>
-                        <td>SCALE</td>
-                        <td>VARIES</td>
-                    </tr>
-                    <tr>
-                        <td>SHEET</td>
-                        <td>3 OF 4</td>
-                    </tr>
-                    <tr>
-                        <td>DATE</td>
-                        <td id="current-date-3">2026-11-21</td>
-                    </tr>
-                    <tr>
-                        <td>DRG NO.</td>
-                        <td>VSN-2026-REV-A</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- SHEET 4: Roadmap & Contact -->
-    <section class="sheet" id="sheet4">
-        <div class="border-frame">
-            <div class="header">
-                <h1>THE ORDER OF WORK</h1>
-                <p>Engineering roadmap, track record & contact</p>
-            </div>
-
-            <div class="timeline">
-                <div class="timeline-bar">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h3>POWER SIMULATION</h3>
-                        <p>LTSpice buck converter design, 12V→3.3V, &gt;92% efficiency verified</p>
-                    </div>
-                </div>
-
-                <div class="timeline-bar">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h3>EMBEDDED FIRMWARE</h3>
-                        <p>ATmega329P ADC sensor interface, UART telemetry framing, Proteus validation</p>
-                    </div>
-                </div>
-
-                <div class="timeline-bar">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h3>RF LINK MODELING</h3>
-                        <p>MATLAB link budget calculator, BPSK/QPSK BER analysis, multi-orbit comparison</p>
-                    </div>
-                </div>
-
-                <div class="timeline-bar">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h3>AVIONICS SCHEMATIC</h3>
-                        <p>KiCad 2-layer PCB, reverse-polarity protection, ERC-clean design</p>
-                    </div>
-                </div>
-
-                <div class="timeline-bar">
-                    <div class="timeline-marker" style="background: var(--line-white);"></div>
-                    <div class="timeline-content">
-                        <h3>PCB LAYOUT & FAB</h3>
-                        <p>Gerber generation, design rule check, fabrication ready</p>
-                    </div>
-                </div>
-
-                <div class="timeline-bar">
-                    <div class="timeline-marker" style="background: var(--line-white);"></div>
-                    <div class="timeline-content">
-                        <h3>INTEGRATION & FLIGHT TEST</h3>
-                        <p>Subsystem integration, environmental testing, flight qualification</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="contact-form">
-                <h2 style="text-align: center; margin-bottom: 30px; letter-spacing: 0.08em;">TRANSMIT INQUIRY</h2>
-                <input type="text" id="contact-name" placeholder="NAME / ORGANIZATION">
-                <input type="email" id="contact-email" placeholder="EMAIL">
-                <input type="text" id="contact-mission" placeholder="MISSION / ROLE INQUIRY">
-                <textarea id="contact-message" rows="5" placeholder="MESSAGE"></textarea>
-                <button onclick="submitForm()">TRANSMIT INQUIRY</button>
-            </div>
-
-            <div class="stamp" id="received-stamp">
-                RECEIVED — D.V.<br>
-                <span id="stamp-date" style="font-size: 1rem;"></span>
-            </div>
-
-            <div class="title-block">
-                <table>
-                    <tr>
-                        <td>TITLE</td>
-                        <td>ENGINEERING ROADMAP & CONTACT</td>
-                    </tr>
-                    <tr>
-                        <td>DRAWN BY</td>
-                        <td>DHRUVRAJSINH VANSIA</td>
-                    </tr>
-                    <tr>
-                        <td>SCALE</td>
-                        <td>N/A</td>
-                    </tr>
-                    <tr>
-                        <td>SHEET</td>
-                        <td>4 OF 4</td>
-                    </tr>
-                    <tr>
-                        <td>DATE</td>
-                        <td id="current-date-4">2026-11-21</td>
-                    </tr>
-                    <tr>
-                        <td>DRG NO.</td>
-                        <td>VSN-2026-REV-A</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Modals -->
-    <div class="modal" id="modal1" onclick="closeModal(event, 'modal1')">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal(event, 'modal1')">&times;</span>
-            <h2>DETAIL 01 — BUCK CONVERTER</h2>
-            <p style="margin: 20px 0;">LTSpice simulation of 12V to 3.3V buck converter with &gt;92% efficiency</p>
-            <img src="assets/buck_output.png" alt="Buck Converter Output Waveform" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
-            <img src="assets/buck_circuit.png" alt="Buck Converter Circuit" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
-            <table class="dimension-table">
-                <tr><td>Input Voltage</td><td>12.0 V</td></tr>
-                <tr><td>Output Voltage</td><td>3.30 V</td></tr>
-                <tr><td>Efficiency</td><td>&gt;92%</td></tr>
-                <tr><td>Tool</td><td>LTSpice</td></tr>
-            </table>
-        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="modal" id="modal2" onclick="closeModal(event, 'modal2')">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal(event, 'modal2')">&times;</span>
-            <h2>DETAIL 02 — ADC & UART TELEMETRY</h2>
-            <p style="margin: 20px 0;">Proteus simulation of ATmega329P ADC sensor interface with UART framing</p>
-            <img src="assets/adc_output.png" alt="ADC Telemetry Output" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
-            <img src="assets/adc_circuit.png" alt="ADC Circuit Schematic" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
-            <table class="dimension-table">
-                <tr><td>ADC Resolution</td><td>10-bit (4.88 mV/step)</td></tr>
-                <tr><td>UART Baud</td><td>9600 bps</td></tr>
-                <tr><td>Packet Format</td><td>PKT_ID | TIME | TEMP | VOLT</td></tr>
-                <tr><td>Tool</td><td>Proteus / AVR-C</td></tr>
-            </table>
+  <!-- ===================================================================== -->
+  <!-- SHEET 3: SUBSYSTEM DETAIL LOUPES & ARTIFACT INSPECTION                -->
+  <!-- ===================================================================== -->
+  <section class="sheet" id="sheet3">
+    <div class="print-margin">
+      <div class="zone-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-bottom"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-left"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+      <div class="zone-right"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+
+      <div class="border-frame">
+        <header class="sheet-header">
+          <div>
+            <h2>SUBSYSTEM DETAILS &amp; VERIFICATION ARTIFACTS</h2>
+            <p class="pencilled-note">Select any circular detail callout to inspect the underlying LTSpice waveforms, Proteus terminal captures, MATLAB plots, or KiCad schematics.</p>
+          </div>
+        </header>
+
+        <div class="details-grid">
+          <!-- Detail 01: Buck Converter -->
+          <article class="detail-card">
+            <div class="loupe-circle" role="button" tabindex="0" onclick="openModal('modal1')" onkeydown="if(event.key==='Enter')openModal('modal1')">
+              <span class="loupe-badge">DETAIL 01</span>
+              <svg viewBox="0 0 140 140" width="130" height="130">
+                <g stroke="#F2F6FA" fill="none" stroke-width="1.6">
+                  <line x1="15" y1="55" x2="40" y2="55" />
+                  <path d="M40,55 Q46,42 52,55 Q58,42 64,55 Q70,42 76,55 Q82,42 88,55" />
+                  <line x1="88" y1="55" x2="125" y2="55" />
+                  <line x1="95" y1="55" x2="95" y2="75" />
+                  <line x1="83" y1="75" x2="107" y2="75" stroke="#FFD23F" />
+                  <line x1="83" y1="82" x2="107" y2="82" stroke="#FFD23F" />
+                  <line x1="95" y1="82" x2="95" y2="105" />
+                  <line x1="87" y1="105" x2="103" y2="105" />
+                </g>
+              </svg>
+            </div>
+            <h3>01. BUCK CONVERTER (12V&rarr;3.3V)</h3>
+            <p class="pencilled-note">Synchronous step-down stage tuned for &gt;92% efficiency and low output ripple under sensor load steps.</p>
+            <button type="button" class="stamp-btn" onclick="openModal('modal1')">INSPECT LTSPICE OUTPUT</button>
+          </article>
+
+          <!-- Detail 02: Proteus ADC & UART -->
+          <article class="detail-card">
+            <div class="loupe-circle" role="button" tabindex="0" onclick="openModal('modal2')" onkeydown="if(event.key==='Enter')openModal('modal2')">
+              <span class="loupe-badge">DETAIL 02</span>
+              <svg viewBox="0 0 140 140" width="130" height="130">
+                <g stroke="#F2F6FA" fill="none" stroke-width="1.5">
+                  <rect x="35" y="40" width="70" height="60" />
+                  <line x1="20" y1="55" x2="35" y2="55" /><line x1="20" y1="70" x2="35" y2="70" /><line x1="20" y1="85" x2="35" y2="85" />
+                  <line x1="105" y1="55" x2="120" y2="55" stroke="#FFD23F" /><line x1="105" y1="70" x2="120" y2="70" stroke="#FFD23F" />
+                  <text x="70" y="73" text-anchor="middle" fill="#F2F6FA" font-size="10" stroke="none">ADC / TX</text>
+                </g>
+              </svg>
+            </div>
+            <h3>02. ATMEGA329P ADC &amp; UART</h3>
+            <p class="pencilled-note">10-bit SAR conversion of LM35 thermal and bus voltage rails streamed at 9600 baud.</p>
+            <button type="button" class="stamp-btn" onclick="openModal('modal2')">INSPECT PROTEUS CAPTURE</button>
+          </article>
+
+          <!-- Detail 03: MATLAB RF Link -->
+          <article class="detail-card">
+            <div class="loupe-circle" role="button" tabindex="0" onclick="openModal('modal3')" onkeydown="if(event.key==='Enter')openModal('modal3')">
+              <span class="loupe-badge">DETAIL 03</span>
+              <svg viewBox="0 0 140 140" width="130" height="130">
+                <g stroke="#F2F6FA" fill="none" stroke-width="1.5">
+                  <line x1="25" y1="105" x2="115" y2="105" />
+                  <line x1="25" y1="35" x2="25" y2="105" />
+                  <path d="M25,42 Q65,46 82,74 T108,103" stroke="#FFD23F" stroke-width="2" />
+                  <circle cx="88" cy="84" r="4" fill="#FFD23F" stroke="none" />
+                </g>
+              </svg>
+            </div>
+            <h3>03. RF LINK &amp; BER ANALYZER</h3>
+            <p class="pencilled-note">Analytical + Monte Carlo BER validation across UHF CubeSat, LEO S-Band, and GEO Ku-Band links.</p>
+            <button type="button" class="stamp-btn" onclick="openModal('modal3')">INSPECT MATLAB RESULTS</button>
+          </article>
+
+          <!-- Detail 04: KiCad Schematic -->
+          <article class="detail-card">
+            <div class="loupe-circle" role="button" tabindex="0" onclick="openModal('modal4')" onkeydown="if(event.key==='Enter')openModal('modal4')">
+              <span class="loupe-badge">DETAIL 04</span>
+              <svg viewBox="0 0 140 140" width="130" height="130">
+                <g stroke="#F2F6FA" fill="none" stroke-width="1.5">
+                  <polygon points="32,70 54,56 54,84" />
+                  <line x1="54" y1="56" x2="54" y2="84" stroke="#FFD23F" stroke-width="2" />
+                  <line x1="18" y1="70" x2="32" y2="70" />
+                  <line x1="54" y1="70" x2="72" y2="70" />
+                  <rect x="72" y="54" width="44" height="32" />
+                  <text x="94" y="73" text-anchor="middle" fill="#F2F6FA" font-size="8.5" stroke="none">AMS1117</text>
+                </g>
+              </svg>
+            </div>
+            <h3>04. AVIONICS NODE SCHEMATIC</h3>
+            <p class="pencilled-note">Schottky reverse-polarity protection, 16 MHz crystal load network, and isolated AVCC/AREF filtering.</p>
+            <button type="button" class="stamp-btn" onclick="openModal('modal4')">INSPECT KICAD SCHEMATIC</button>
+          </article>
         </div>
-    </div>
 
-    <div class="modal" id="modal3" onclick="closeModal(event, 'modal3')">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal(event, 'modal3')">&times;</span>
-            <h2>DETAIL 03 — RF LINK BUDGET</h2>
-            <p style="margin: 20px 0;">MATLAB link budget calculator with BER analysis for multiple orbit profiles</p>
-            <img src="assets/rf_analysis.png" alt="RF Link Budget Analysis" style="max-width: 100%; margin: 20px 0; border: 2px solid var(--line-white);">
-            <table class="dimension-table">
-                <tr><td>Carrier Frequency</td><td>437 MHz (UHF)</td></tr>
-                <tr><td>Slant Range</td><td>1450 km (LEO)</td></tr>
-                <tr><td>Eb/N0</td><td>23.65 dB</td></tr>
-                <tr><td>Link Margin</td><td>+14.07 dB</td></tr>
-                <tr><td>Tool</td><td>MATLAB App Designer</td></tr>
-            </table>
+        <!-- Engineering Title Block (Sheet 3) -->
+        <div class="title-block tabular">
+          <div class="title-block-grid">
+            <div class="tb-cell"><span class="tb-label">TITLE</span><span class="tb-val">SUBSYSTEM DETAIL CALLOUTS</span></div>
+            <div class="tb-cell"><span class="tb-label">DRAWN BY</span><span class="tb-val">DHRUVRAJSINH VANSIA</span></div>
+            <div class="tb-cell"><span class="tb-label">SCALE</span><span class="tb-val">ENLARGED</span></div>
+            <div class="tb-cell"><span class="tb-label">SHEET</span><span class="tb-val">3 OF 4</span></div>
+            <div class="tb-cell"><span class="tb-label">DATE</span><span class="tb-val live-date">2026-11-21</span></div>
+            <div class="tb-cell"><span class="tb-label">DRG NO.</span><span class="tb-val tb-rev-yellow live-drg-no">VSN-2026-REV-A</span></div>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
 
-    <div class="modal" id="modal4" onclick="closeModal(event, 'modal4')">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal(event, 'modal4')">&times;</span>
-            <h2>DETAIL 04 — AVIONICS SCHEMATIC</h2>
-            <p style="margin: 20px 0;">KiCad 2-layer PCB design with reverse-polarity protection and decoupled power rails</p>
-            <object data="assets/satellite_schematic.svg" type="image/svg+xml" style="width: 100%; height: 400px; margin: 20px 0; border: 2px solid var(--line-white);"></object>
-            <table class="dimension-table">
-                <tr><td>Microcontroller</td><td>ATmega328P-A</td></tr>
-                <tr><td>Clock</td><td>16 MHz Crystal</td></tr>
-                <tr><td>Power Protection</td><td>1N5819 Reverse Polarity</td></tr>
-                <tr><td>LDO Regulator</td><td>AMS1117-3.3</td></tr>
-                <tr><td>Tool</td><td>KiCad 9</td></tr>
+  <!-- ===================================================================== -->
+  <!-- SHEET 4: THE ORDER OF WORK — ROADMAP, DELIVERABLES & CONTACT STAMP    -->
+  <!-- ===================================================================== -->
+  <section class="sheet" id="sheet4">
+    <div class="print-margin">
+      <div class="zone-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-bottom"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+      <div class="zone-left"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+      <div class="zone-right"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+
+      <div class="border-frame">
+        <header class="sheet-header">
+          <div>
+            <h2>THE ORDER OF WORK: ENGINEERING TRACK &amp; INQUIRY</h2>
+            <p class="pencilled-note">From SPICE power modeling to flight-ready hardware — M.Sc. Space Science &amp; Technology, University of Bremen.</p>
+          </div>
+        </header>
+
+        <!-- Horizontal Gantt-Style Engineering Bar Chart -->
+        <table class="gantt-table tabular">
+          <thead>
+            <tr>
+              <th style="width: 24%;">PHASE / SUBSYSTEM</th>
+              <th style="width: 38%;">SCHEDULE BAR (WEEKS 1–14)</th>
+              <th style="width: 38%;">BUILDER'S BENCH NOTE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>01. POWER SIMULATION</td>
+              <td><div class="gantt-track"><div class="gantt-bar" style="left: 0%; width: 18%;"></div></div></td>
+              <td class="pencilled-note">12V to 3.3V buck verified &gt;92% efficiency in LTSpice.</td>
+            </tr>
+            <tr>
+              <td>02. EMBEDDED TELEMETRY</td>
+              <td><div class="gantt-track"><div class="gantt-bar" style="left: 16%; width: 20%;"></div></div></td>
+              <td class="pencilled-note">ATmega329P 10-bit ADC + 9600 bps UART packet stream verified.</td>
+            </tr>
+            <tr>
+              <td>03. RF LINK MODELING</td>
+              <td><div class="gantt-track"><div class="gantt-bar" style="left: 34%; width: 22%;"></div></div></td>
+              <td class="pencilled-note">MATLAB BPSK/QPSK link budget &amp; App Designer GUI validated.</td>
+            </tr>
+            <tr>
+              <td>04. AVIONICS SCHEMATIC</td>
+              <td><div class="gantt-track"><div class="gantt-bar" style="left: 54%; width: 18%;"></div></div></td>
+              <td class="pencilled-note">ATmega328P-A sensor node schematic captured &amp; ERC clean.</td>
+            </tr>
+            <tr>
+              <td>05. 2-LAYER PCB &amp; GERBER</td>
+              <td><div class="gantt-track"><div class="gantt-bar active-phase" style="left: 70%; width: 16%;"></div></div></td>
+              <td class="pencilled-note">Active stage: ground plane pour, DRC &amp; Gerber fab release.</td>
+            </tr>
+            <tr>
+              <td>06. HARDWARE BRING-UP</td>
+              <td><div class="gantt-track"><div class="gantt-bar" style="left: 84%; width: 16%; opacity: 0.45;"></div></div></td>
+              <td class="pencilled-note">Bench probing, thermal drift calibration &amp; RF range test.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sheet4-bottom">
+          <!-- Verification Matrix -->
+          <div>
+            <h3 style="font-size: 0.9rem; margin-bottom: 10px;">VERIFIED DELIVERABLES SUMMARY</h3>
+            <table class="bp-table tabular">
+              <thead>
+                <tr>
+                  <th>PROJECT</th>
+                  <th>TOOLCHAIN</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>BUCK CONVERTER (12V/3.3V)</td><td>LTSPICE XVII</td><td>COMPLETE (&gt;92% EFF)</td></tr>
+                <tr><td>ADC SENSOR INTERFACE</td><td>PROTEUS / AVR-C</td><td>COMPLETE (10-BIT UART)</td></tr>
+                <tr><td>RF LINK BUDGET ENGINE</td><td>MATLAB / APP DESIGNER</td><td>COMPLETE (LEO/GEO)</td></tr>
+                <tr><td>SENSOR NODE AVIONICS</td><td>KICAD 9</td><td>SCHEMATIC COMPLETE</td></tr>
+              </tbody>
             </table>
+            <p class="pencilled-note" style="margin-top: 12px;">
+              B.E. Instrumentation &amp; Control (Minor in Robotics) &bull; Former Project Trainee at PRL / ISRO &bull; M.Sc. Space Science &amp; Technology (University of Bremen).
+            </p>
+          </div>
+
+          <!-- Stamped Engineering Inquiry Form (Client-Side, No Network) -->
+          <form class="inquiry-form" id="inquiry-form" onsubmit="handleStampSubmit(event)">
+            <h3 style="font-size: 0.9rem; margin-bottom: 10px; color: var(--bp-yellow);">TRANSMIT ENGINEERING INQUIRY</h3>
+            <div class="form-row">
+              <label for="inq-name">NAME / ORGANIZATION</label>
+              <input type="text" id="inq-name" required placeholder="E.G. DR. LARS / SPACE SYSTEMS LAB" />
+            </div>
+            <div class="form-row">
+              <label for="inq-role">SUBJECT / OPPORTUNITY</label>
+              <input type="text" id="inq-role" required placeholder="MASTER THESIS / AVIONICS R&amp;D / COLLABORATION" />
+            </div>
+            <div class="form-row">
+              <label for="inq-msg">TECHNICAL BRIEF</label>
+              <textarea id="inq-msg" rows="3" required placeholder="ENTER MESSAGE..."></textarea>
+            </div>
+            <button type="submit" class="cta-yellow">STAMP &amp; LOG INQUIRY</button>
+
+            <div class="ink-stamp tabular" id="ink-stamp" aria-live="polite">
+              RECEIVED &mdash; D.V.<br />
+              <span id="stamp-date-text" style="font-size: 0.72rem;"></span>
+            </div>
+          </form>
         </div>
+
+        <!-- Engineering Title Block (Sheet 4) -->
+        <div class="title-block tabular">
+          <div class="title-block-grid">
+            <div class="tb-cell"><span class="tb-label">TITLE</span><span class="tb-val">ORDER OF WORK &amp; TRANSMITTAL</span></div>
+            <div class="tb-cell"><span class="tb-label">DRAWN BY</span><span class="tb-val">DHRUVRAJSINH VANSIA</span></div>
+            <div class="tb-cell"><span class="tb-label">SCALE</span><span class="tb-val">NTS</span></div>
+            <div class="tb-cell"><span class="tb-label">SHEET</span><span class="tb-val">4 OF 4</span></div>
+            <div class="tb-cell"><span class="tb-label">DATE</span><span class="tb-val live-date">2026-11-21</span></div>
+            <div class="tb-cell"><span class="tb-label">DRG NO.</span><span class="tb-val tb-rev-yellow live-drg-no">VSN-2026-REV-A</span></div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <script>
-        // Set current dates
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('current-date').textContent = today;
-        document.getElementById('current-date-2').textContent = today;
-        document.getElementById('current-date-3').textContent = today;
-        document.getElementById('current-date-4').textContent = today;
+  <!-- ===================================================================== -->
+  <!-- ARTIFACT INSPECTION MODALS (WIRED TO LOCAL assets/ FOLDER)            -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop" id="modal1" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('modal1')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>DETAIL 01 — BUCK CONVERTER (12V &rarr; 3.3V) [LTSPICE]</h3>
+        <button type="button" class="stamp-btn" onclick="closeModal('modal1')">CLOSE [ESC]</button>
+      </div>
+      <p class="pencilled-note">Verified &gt;92% conversion efficiency and tight steady-state ripple regulation for avionics logic rails.</p>
+      <div class="artifact-preview">
+        <img src="assets/buck_output.png" alt="Buck Converter LTSpice Output" onerror="this.style.display='none'" />
+        <img src="assets/buck_circuit.png" alt="Buck Converter LTSpice Schematic" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </div>
 
-        // Add grid markers
-        const gridContainer = document.querySelector('.grid-markers');
-        const letters = ['A', 'B', 'C', 'D'];
-        const numbers = ['1', '2', '3', '4', '5', '6'];
-        
-        letters.forEach((letter, i) => {
-            const marker = document.createElement('div');
-            marker.className = 'grid-marker';
-            marker.textContent = letter;
-            marker.style.left = '10px';
-            marker.style.top = `${20 + i * 25}%`;
-            gridContainer.appendChild(marker);
-        });
+  <div class="modal-backdrop" id="modal2" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('modal2')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>DETAIL 02 — ATMEGA329P ADC &amp; UART TELEMETRY [PROTEUS]</h3>
+        <button type="button" class="stamp-btn" onclick="closeModal('modal2')">CLOSE [ESC]</button>
+      </div>
+      <p class="pencilled-note">10-bit ADC sampling of LM35 temperature (18.07°C) and bus voltage (2.95V) streamed over 9600 bps UART.</p>
+      <div class="artifact-preview">
+        <img src="assets/adc_output.png" alt="Proteus Virtual Terminal Telemetry Output" onerror="this.style.display='none'" />
+        <img src="assets/adc_circuit.png" alt="Proteus ATmega329P Schematic" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </div>
 
-        numbers.forEach((num, i) => {
-            const marker = document.createElement('div');
-            marker.className = 'grid-marker';
-            marker.textContent = num;
-            marker.style.top = '10px';
-            marker.style.left = `${15 + i * 14}%`;
-            gridContainer.appendChild(marker);
-        });
+  <div class="modal-backdrop" id="modal3" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('modal3')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>DETAIL 03 — RF LINK BUDGET &amp; BER CURVES [MATLAB]</h3>
+        <button type="button" class="stamp-btn" onclick="closeModal('modal3')">CLOSE [ESC]</button>
+      </div>
+      <p class="pencilled-note">Validated analytical erfc BER curves against Monte Carlo simulations and multi-orbit LEO/GEO test cases.</p>
+      <div class="artifact-preview">
+        <img src="assets/rf_analysis.png" alt="MATLAB RF Link Budget & BER Plot" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </div>
 
-        // Link budget calculator
-        const freqSlider = document.getElementById('freq-slider');
-        const rangeSlider = document.getElementById('range-slider');
-        const rateSlider = document.getElementById('rate-slider');
-        const profileSlider = document.getElementById('profile-slider');
+  <div class="modal-backdrop" id="modal4" role="dialog" aria-modal="true" onclick="if(event.target===this)closeModal('modal4')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>DETAIL 04 — SATELLITE SENSOR NODE SCHEMATIC [KICAD]</h3>
+        <button type="button" class="stamp-btn" onclick="closeModal('modal4')">CLOSE [ESC]</button>
+      </div>
+      <p class="pencilled-note">Complete ERC-clean schematic with 1N5819 reverse-polarity protection, AMS1117-3.3 LDO, 16 MHz crystal, and AVR-ISP/I2C/UART ports.</p>
+      <div class="artifact-preview">
+        <img src="assets/satellite_schematic.png" alt="KiCad Sensor Node Schematic" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </div>
 
-        function calculateLinkBudget() {
-            const freq = parseFloat(freqSlider.value) * 1e6; // Hz
-            const range = parseFloat(rangeSlider.value) * 1000; // meters
-            const rate = parseFloat(rateSlider.value); // bps
-            const profile = parseInt(profileSlider.value);
+  <script>
+    // 1. Live Date Injection Across All Title Blocks
+    const todayISO = new Date().toISOString().split("T")[0];
+    document.querySelectorAll(".live-date").forEach(el => el.textContent = todayISO);
 
-            // Update display values
-            document.getElementById('freq-value').textContent = `${(freq / 1e6).toFixed(0)} MHz`;
-            document.getElementById('range-value').textContent = `${(range / 1000).toFixed(0)} km`;
-            document.getElementById('rate-value').textContent = `${(rate / 1000).toFixed(1)} kbps`;
-            
-            const profiles = ['CUBESAT UHF', 'LEO S-BAND', 'GEO KU-BAND'];
-            document.getElementById('profile-value').textContent = profiles[profile];
+    // 2. Hero Drawing Interactive Crosshair (Millimetres from Bottom-Left Datum)
+    const heroStage = document.getElementById("hero-stage");
+    const heroSvg = document.getElementById("hero-svg");
+    const coordReadout = document.getElementById("coord-readout");
 
-            // Physics constants
-            const c = 3e8; // speed of light
-            const lambda = c / freq;
-            const k = 1.38e-23; // Boltzmann constant
-            const T0 = 290; // reference temperature
+    heroStage.addEventListener("mousemove", (e) => {
+      const rect = heroSvg.getBoundingClientRect();
+      const xMm = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1);
+      const yMm = (((rect.bottom - e.clientY) / rect.height) * 60).toFixed(1);
+      coordReadout.textContent = `DATUM X: +${xMm} mm | Y: +${yMm} mm`;
+    });
 
-            // Mission profile parameters
-            const txPower = [0.5, 2, 5][profile]; // W
-            const txLoss = 1.5; // dB
-            const txGain = [2, 5, 40][profile]; // dBi
-            const rxGain = [2, 5, 50][profile]; // dBi
-            const sysNoiseTemp = [500, 300, 150][profile]; // K
-            const miscLoss = 2; // dB
-            const ebnoReq = 9.6; // dB for BPSK, BER ~1e-5
+    // 3. Subsystem Hover/Tap Leader-Line Spec Callouts
+    const specCallout = document.getElementById("spec-callout");
+    document.querySelectorAll(".subsystem-group").forEach(group => {
+      const activateSpec = () => {
+        document.querySelectorAll(".subsystem-group").forEach(g => g.classList.remove("active"));
+        group.classList.add("active");
+        specCallout.firstElementChild.textContent = group.dataset.spec;
+      };
+      group.addEventListener("mouseenter", activateSpec);
+      group.addEventListener("focus", activateSpec);
+      group.addEventListener("click", activateSpec);
+    });
 
-            // Calculate EIRP
-            const ptxDbw = 10 * Math.log10(txPower);
-            const eirp = ptxDbw - txLoss + txGain;
+    // 4. Bidirectional Schedule Row <-> Drawing Dimension Highlighting
+    document.querySelectorAll("#schedule-table tbody tr").forEach(row => {
+      const dimKey = row.dataset.dim;
+      const targetDim = document.querySelector(`.dim-group[data-dim="${dimKey}"]`);
+      row.addEventListener("mouseenter", () => {
+        row.classList.add("active-row");
+        if (targetDim) targetDim.classList.add("highlighted");
+      });
+      row.addEventListener("mouseleave", () => {
+        row.classList.remove("active-row");
+        if (targetDim) targetDim.classList.remove("highlighted");
+      });
+    });
 
-            // Calculate FSPL
-            const fspl = 20 * Math.log10(4 * Math.PI * range / lambda);
+    // 5. Mathematical erfc(x) & Static BER Waterfall Curve Generation
+    function erfc(x) {
+      const z = Math.abs(x);
+      const t = 1 / (1 + 0.5 * z);
+      const r = t * Math.exp(
+        -z * z - 1.26551223 +
+        t * (1.00002368 +
+        t * (0.37409196 +
+        t * (0.09678418 +
+        t * (-0.18628806 +
+        t * (0.27886807 +
+        t * (-1.13520398 +
+        t * (1.48851587 +
+        t * (-0.82215223 +
+        t * 0.17087277))))))))
+      );
+      return x >= 0 ? r : 2 - r;
+    }
 
-            // Calculate C/N0
-            const gt = rxGain - 10 * Math.log10(sysNoiseTemp / T0);
-            const cn0 = eirp - fspl - miscLoss + gt + 228.6;
+    function buildWaterfallCurve() {
+      const pts = [];
+      for (let ebn0Db = 0; ebn0Db <= 16; ebn0Db += 0.4) {
+        const lin = Math.pow(10, ebn0Db / 10);
+        const ber = Math.max(0.5 * erfc(Math.sqrt(lin)), 1e-12);
+        const x = 420 + (ebn0Db / 16) * 304;
+        const logBer = Math.log10(ber); // 0 to -12
+        const y = 45 + (-logBer / 12) * 290;
+        pts.push(`${pts.length === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`);
+      }
+      document.getElementById("ber-waterfall-path").setAttribute("d", pts.join(" "));
+    }
+    buildWaterfallCurve();
 
-            // Calculate Eb/N0
-            const ebn0 = cn0 - 10 * Math.log10(rate);
+    // 6. Sheet 2 Live Physics Configurator & Revisions Logger (Skips I, O, Q)
+    const PROFILES = {
+      cubesat: { label: "CUBESAT UHF (BPSK)", freq: 437, range: 1450, rate: 9.6, txW: 1.0, txLoss: 0.8, txGain: 2.15, rxGain: 14.0, rxLoss: 1.5, tempK: 500, miscLoss: 3.5, reqBer: 1e-5 },
+      leo:     { label: "LEO S-BAND (QPSK)",  freq: 2200, range: 1200, rate: 2000, txW: 5.0, txLoss: 1.0, txGain: 6.0, rxGain: 32.0, rxLoss: 1.2, tempK: 290, miscLoss: 1.7, reqBer: 1e-6 },
+      geo:     { label: "GEO KU-BAND (QPSK)", freq: 12000, range: 38500, rate: 10000, txW: 40.0, txLoss: 1.5, txGain: 30.0, rxGain: 42.0, rxLoss: 1.0, tempK: 150, miscLoss: 3.9, reqBer: 1e-7 }
+    };
 
-            // Calculate BER (approximation for BPSK)
-            const ebn0Linear = Math.pow(10, ebn0 / 10);
-            const ber = 0.5 * erfc(Math.sqrt(ebn0Linear));
+    let currentProfileKey = "cubesat";
+    const VALID_REV_LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"; // Skips I, O, Q
+    let revIndex = 0;
+    let lastState = { freq: 437, range: 1450, rate: 9.6, profile: "cubesat" };
 
-            // Calculate link margin
-            const margin = ebn0 - ebnoReq;
+    const sliderFreq = document.getElementById("slider-freq");
+    const sliderRange = document.getElementById("slider-range");
+    const sliderRate = document.getElementById("slider-rate");
 
-            // Update table
-            document.getElementById('eirp-value').textContent = `${eirp.toFixed(2)} dBW`;
-            document.getElementById('fspl-value').textContent = `${fspl.toFixed(1)} dB`;
-            document.getElementById('cn0-value').textContent = `${cn0.toFixed(1)} dB-Hz`;
-            document.getElementById('ebn0-value').textContent = `${ebn0.toFixed(2)} dB`;
-            document.getElementById('ber-value').textContent = ber.toExponential(2);
-            document.getElementById('margin-value').textContent = `${margin >= 0 ? '+' : ''}${margin.toFixed(2)} dB`;
+    function triggerFlash(el) {
+      el.classList.remove("val-flash");
+      void el.offsetWidth;
+      el.classList.add("val-flash");
+    }
 
-            // Update link closure indicator
-            const closureBox = document.getElementById('link-closure-box');
-            if (margin >= 3) {
-                closureBox.setAttribute('fill', '#FFD23F');
-            } else {
-                closureBox.setAttribute('fill', '#F2F6FA');
-            }
+    function logRevision(deltaText, noteText) {
+      revIndex = Math.min(revIndex + 1, VALID_REV_LETTERS.length - 1);
+      const revCode = `REV ${VALID_REV_LETTERS[revIndex]}`;
+      document.querySelectorAll(".live-drg-no").forEach(el => {
+        el.textContent = `VSN-2026-${revCode.replace(" ", "-")}`;
+      });
 
-            // Update operating point on BER curve
-            const opPoint = document.getElementById('operating-point');
-            const x = 100 + (ebn0 / 30) * 800; // Map 0-30 dB to canvas
-            const y = 350 - Math.log10(Math.max(ber, 1e-12)) * 30; // Log scale for BER
-            opPoint.setAttribute('cx', Math.max(100, Math.min(900, x)));
-            opPoint.setAttribute('cy', Math.max(50, Math.min(350, y)));
+      const tbody = document.getElementById("revisions-body");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td style="color: var(--bp-yellow); font-weight: bold;">${revCode}</td><td>${deltaText}</td><td class="pencilled-note">${noteText}</td>`;
+      tbody.prepend(tr);
+    }
+
+    function recalculateLink(recordRevision = false) {
+      const p = PROFILES[currentProfileKey];
+      const freqMHz = parseFloat(sliderFreq.value);
+      const rangeKm = parseFloat(sliderRange.value);
+      const rateKbps = parseFloat(sliderRate.value);
+
+      document.getElementById("val-freq").textContent = `${freqMHz.toFixed(0)} MHz`;
+      document.getElementById("val-range").textContent = `${rangeKm.toFixed(0)} km`;
+      document.getElementById("val-rate").textContent = rateKbps >= 1000 ? `${(rateKbps / 1000).toFixed(2)} Mbps` : `${rateKbps.toFixed(1)} kbps`;
+
+      const c = 2.99792458e8;
+      const lambda = c / (freqMHz * 1e6);
+      const eirp = 10 * Math.log10(p.txW) - p.txLoss + p.txGain;
+      const fspl = 20 * Math.log10((4 * Math.PI * rangeKm * 1e3) / lambda);
+      const gt = p.rxGain - p.rxLoss - 10 * Math.log10(p.tempK);
+      const cn0 = eirp - fspl - p.miscLoss + gt + 228.6;
+      const ebn0 = cn0 - 10 * Math.log10(rateKbps * 1e3);
+      const ber = 0.5 * erfc(Math.sqrt(Math.max(Math.pow(10, ebn0 / 10), 0)));
+      const reqEbN0 = currentProfileKey === "geo" ? 11.31 : (currentProfileKey === "leo" ? 10.53 : 9.59);
+      const margin = ebn0 - reqEbN0;
+
+      // Update Table with Flash
+      const outMap = {
+        "out-eirp": `${eirp >= 0 ? "+" : ""}${eirp.toFixed(2)} dBW`,
+        "out-fspl": `${fspl.toFixed(2)} dB`,
+        "out-gt": `${gt.toFixed(2)} dB/K`,
+        "out-cn0": `${cn0.toFixed(2)} dB-Hz`,
+        "out-ebn0": `${ebn0.toFixed(2)} dB`,
+        "out-ber": ber < 1e-99 ? "< 1e-99" : ber.toExponential(2),
+        "out-margin": `${margin >= 0 ? "+" : ""}${margin.toFixed(2)} dB`
+      };
+
+      Object.entries(outMap).forEach(([id, text]) => {
+        const el = document.getElementById(id);
+        if (el.textContent !== text) {
+          el.textContent = text;
+          triggerFlash(el);
         }
+      });
 
-        // Complementary error function approximation
-        function erfc(x) {
-            const t = 1 / (1 + 0.5 * Math.abs(x));
-            const tau = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
-            return x >= 0 ? tau : 2 - tau;
+      // Re-draft Orbital Geometry SVG (Altitude Y & Beam Cone Width)
+      const normAlt = (rangeKm - 400) / (38500 - 400); // 0 to 1
+      const satY = 235 - normAlt * 185; // 235 (low LEO) up to 50 (GEO)
+      const coneHalfWidth = Math.max(18, 72 - (freqMHz / 12000) * 52);
+
+      document.getElementById("live-sat-node").setAttribute("transform", `translate(180, ${satY.toFixed(1)})`);
+      document.getElementById("live-slant-line").setAttribute("y1", satY.toFixed(1));
+      document.getElementById("live-beam-cone").setAttribute(
+        "points",
+        `180,${satY.toFixed(1)} ${(180 - coneHalfWidth).toFixed(1)},326 ${(180 + coneHalfWidth).toFixed(1)},326`
+      );
+      document.getElementById("svg-range-label").textContent = `d = ${rangeKm.toFixed(0)} km`;
+      document.getElementById("svg-fspl-label").textContent = `FSPL = ${fspl.toFixed(1)} dB`;
+
+      // Re-position Operating Point on BER Waterfall
+      const clampedEb = Math.max(0, Math.min(16, ebn0));
+      const opX = 420 + (clampedEb / 16) * 304;
+      const clampedLogBer = Math.max(-12, Math.min(0, Math.log10(Math.max(ber, 1e-12))));
+      const opY = 45 + (-clampedLogBer / 12) * 290;
+
+      const opCircle = document.getElementById("ber-op-circle");
+      opCircle.setAttribute("cx", opX.toFixed(1));
+      opCircle.setAttribute("cy", opY.toFixed(1));
+      const opLabel = document.getElementById("ber-op-label");
+      opLabel.setAttribute("x", Math.max(485, opX - 8).toFixed(1));
+      opLabel.setAttribute("y", Math.max(65, opY - 10).toFixed(1));
+      opLabel.textContent = `OP: ${ebn0.toFixed(1)} dB`;
+
+      // Update Auto-Ticking Link Closure Check Box & UART Frame
+      const checkEl = document.getElementById("closure-check");
+      const remarkEl = document.getElementById("closure-remark");
+      const statusTag = margin >= 3.0 ? "NOMINAL" : (margin >= 0 ? "MARGINAL" : "LINK FAIL");
+
+      if (margin >= 3.0) {
+        checkEl.innerHTML = "&#10003;";
+        checkEl.style.borderColor = "#FFD23F";
+        checkEl.style.color = "#FFD23F";
+        remarkEl.textContent = `Nominal closure (+${margin.toFixed(2)} dB margin) — clear-sky telemetry verified.`;
+      } else if (margin >= 0) {
+        checkEl.innerHTML = "~";
+        checkEl.style.borderColor = "#FFD23F";
+        remarkEl.textContent = `Marginal closure (+${margin.toFixed(2)} dB < 3 dB) — enable FEC coding gain.`;
+      } else {
+        checkEl.innerHTML = "&times;";
+        checkEl.style.borderColor = "#F2F6FA";
+        checkEl.style.color = "#F2F6FA";
+        remarkEl.textContent = `Link closure failed (${margin.toFixed(2)} dB) — reduce bit rate or increase antenna gain.`;
+      }
+
+      document.getElementById("uart-packet-text").textContent =
+        `PKT_078 | FREQ:${freqMHz.toFixed(0)}MHz | RATE:${rateKbps}kbps | Eb/N0:${ebn0.toFixed(1)}dB | ${statusTag}`;
+
+      // Record Revision Entry on User Interaction
+      if (recordRevision) {
+        if (freqMHz !== lastState.freq) {
+          const diff = freqMHz - lastState.freq;
+          logRevision(`CARRIER FREQ ${diff > 0 ? "+" : ""}${diff.toFixed(0)} MHz`, "Adjusted RF wavelength and free-space path loss.");
+        } else if (rangeKm !== lastState.range) {
+          const diff = rangeKm - lastState.range;
+          logRevision(`SLANT RANGE ${diff > 0 ? "+" : ""}${diff.toFixed(0)} km`, "Recalculated orbital path attenuation & beam footprint.");
+        } else if (rateKbps !== lastState.rate) {
+          const diff = rateKbps - lastState.rate;
+          logRevision(`DATA RATE ${diff > 0 ? "+" : ""}${diff.toFixed(1)} kbps`, "Updated energy-per-bit integration window (Eb/N0).");
         }
+        lastState = { freq: freqMHz, range: rangeKm, rate: rateKbps, profile: currentProfileKey };
+      }
+    }
 
-        // Add event listeners
-        freqSlider.addEventListener('input', calculateLinkBudget);
-        rangeSlider.addEventListener('input', calculateLinkBudget);
-        rateSlider.addEventListener('input', calculateLinkBudget);
-        profileSlider.addEventListener('input', calculateLinkBudget);
+    sliderFreq.addEventListener("change", () => recalculateLink(true));
+    sliderRange.addEventListener("change", () => recalculateLink(true));
+    sliderRate.addEventListener("change", () => recalculateLink(true));
+    sliderFreq.addEventListener("input", () => recalculateLink(false));
+    sliderRange.addEventListener("input", () => recalculateLink(false));
+    sliderRate.addEventListener("input", () => recalculateLink(false));
 
-        // Initial calculation
-        calculateLinkBudget();
+    document.querySelectorAll(".stamp-btn[data-profile]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".stamp-btn[data-profile]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentProfileKey = btn.dataset.profile;
+        const p = PROFILES[currentProfileKey];
+        document.getElementById("val-profile").textContent = p.label;
+        sliderFreq.value = p.freq;
+        sliderRange.value = p.range;
+        sliderRate.value = p.rate;
+        lastState = { freq: p.freq, range: p.range, rate: p.rate, profile: currentProfileKey };
+        logRevision(`PROFILE → ${p.label}`, `Loaded ${p.txW}W Tx, ${p.txGain}/${p.rxGain} dBi antennas, ${p.tempK}K LNA.`);
+        recalculateLink(false);
+      });
+    });
 
-        // Modal functions
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
+    recalculateLink(false);
 
-        function closeModal(event, modalId) {
-            if (event.target === document.getElementById(modalId) || event.target.classList.contains('modal-close')) {
-                document.getElementById(modalId).style.display = 'none';
-            }
-        }
+    // 7. Modals & Escape Key Handling
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal-backdrop.open").forEach(m => m.classList.remove("open"));
+      }
+    });
 
-        // Contact form submission
-        function submitForm() {
-            const name = document.getElementById('contact-name').value;
-            const email = document.getElementById('contact-email').value;
-            const mission = document.getElementById('contact-mission').value;
-            const message = document.getElementById('contact-message').value;
-
-            if (name && email && mission && message) {
-                const stamp = document.getElementById('received-stamp');
-                const stampDate = document.getElementById('stamp-date');
-                stampDate.textContent = today;
-                stamp.classList.add('visible');
-
-                setTimeout(() => {
-                    stamp.classList.remove('visible');
-                    document.getElementById('contact-name').value = '';
-                    document.getElementById('contact-email').value = '';
-                    document.getElementById('contact-mission').value = '';
-                    document.getElementById('contact-message').value = '';
-                }, 3000);
-            } else {
-                alert('Please fill in all fields');
-            }
-        }
-
-        // Intersection Observer for Sheet 2 animation trigger
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.target.id === 'sheet2' && entry.isIntersecting) {
-                    calculateLinkBudget();
-                }
-            });
-        }, { threshold: 0.1 });
-
-        observer.observe(document.getElementById('sheet2'));
-    </script>
+    // 8. Client-Side Stamped Inquiry Form (No Network)
+    function handleStampSubmit(e) {
+      e.preventDefault();
+      const stamp = document.getElementById("ink-stamp");
+      document.getElementById("stamp-date-text").textContent = `DATE: ${todayISO}`;
+      stamp.classList.add("stamped");
+    }
+  </script>
 </body>
 </html>
